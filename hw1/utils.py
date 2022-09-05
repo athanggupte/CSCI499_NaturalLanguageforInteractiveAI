@@ -1,8 +1,11 @@
+from log import get_logger
+import json
 import re
 import torch
 import numpy as np
 from collections import Counter
 
+log = get_logger()
 
 def get_device(force_cpu, status=True):
     # if not force_cpu and torch.backends.mps.is_available():
@@ -74,3 +77,65 @@ def build_output_tables(train):
     index_to_actions = {actions_to_index[a]: a for a in actions_to_index}
     index_to_targets = {targets_to_index[t]: t for t in targets_to_index}
     return actions_to_index, index_to_actions, targets_to_index, index_to_targets
+
+
+# Extra utility functions
+def extract_episodes_from_json(filename):
+    with open(filename, 'r') as file:
+        contents = json.load(file)
+        train_data, val_data = contents['train'], contents['valid_seen']
+        log.info("Train #episodes: %d" % len(train_data))
+        log.info("Val #episodes: %d" % len(val_data))
+        return train_data, val_data
+
+def flatten_episodes(episodes):
+    data = []
+    for episode in episodes:
+        for inst, outseq in episode:
+            inst = preprocess_string(inst).lower()
+            action, target = outseq
+            data.append((inst, action, target))
+    return data
+
+def encode_data(data, v2i, a2i, t2i, seq_len=0):
+    n_data = len(data)
+    # x = np.zeros((n_data, seq_len), dtype=np.int32)
+    y = np.zeros((n_data, 2), dtype=np.int32)
+    x = [None for i,a,t in data]
+
+    idx = 0
+    n_tokens = 0
+    n_unks = 0
+    n_early_cutoffs = 0
+    for inst, action, target in data:
+        inst = preprocess_string(inst)
+        tokens = inst.split()
+        tkn_idx = [ v2i['<start>'] ]
+        for word in tokens:
+            if len(word) > 0:
+                tkn_idx.append(v2i[word] if word in v2i else v2i['<unk>'])
+                n_tokens += 1
+                n_unks += 1 if tkn_idx[-1] == v2i['<unk>'] else 0
+                if seq_len > 0 and len(tkn_idx) == seq_len - 1:
+                    n_early_cutoffs += 1
+                    break
+        tkn_idx.append(v2i['<end>'])
+        x[idx] = np.array(tkn_idx, dtype=np.int32)
+        y[idx][0] = a2i[action]
+        y[idx][1] = t2i[target]
+        idx += 1
+    log.info(
+        "Total instances: %d" % n_data
+    )
+    log.info(
+        "UNK tokens : %d / %d (%.4f)     (vocab_size = %d)"
+        % (n_unks, n_tokens, n_unks/n_tokens, len(v2i))
+    )
+    # log.info(
+    #     "Cut off %d instances at len %d before true ending"
+    #     % (n_early_cutoffs, seq_len)
+    # )
+    log.info(
+        "encoded %d instances without regard to order" % idx
+    )
+    return x, y
