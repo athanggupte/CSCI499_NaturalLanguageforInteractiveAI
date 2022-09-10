@@ -1,0 +1,12 @@
+TODO:
+1. Attention layer over LSTM output
+    - fix size
+2. Multiple instructions -
+    - i_k-1, i_k, i_k+1 -> a_k, t_k
+    - sentence encoding - another RNN on top of the current LSTM sequence
+    - attention on top of the LSTM sentence embeddings
+
+
+Q. Why not store the hidden and context parameters to pass next iteration?
+- Do we want to learn the initial hidden and context/cell state?
+- Starting with a pretrained inital state -> less generalization

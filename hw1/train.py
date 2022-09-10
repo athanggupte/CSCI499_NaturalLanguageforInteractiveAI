@@ -5,6 +5,7 @@ from datautil import IndexedDataset, get_dataloader
 from log import log_filename, next_path, setup_logging, get_logger, last_path
 import tqdm
 import torch
+import torchmetrics
 import numpy as np
 import argparse
 from sklearn.metrics import accuracy_score
@@ -380,13 +381,15 @@ def main(args):
     action_criterion, target_criterion, optimizer = setup_optimizer(args, model)
 
     if args.eval:
-        model_filepath = "models/model-%s.pt" % args.eval_model_id if args.eval_model_id != -1 else last_path("models/model-%s.pt")
+        # model_filepath = "models/model-%s.pt" % args.eval_model_id if args.eval_model_id != -1 else last_path("models/model-%s.pt")
+        model_filepath = args.eval_model_path or last_path("models/model-%s.pt")
         model.load_state_dict(torch.load(model_filepath))
 
         val_action_loss, val_target_loss, val_action_acc, val_target_acc, (action_preds, target_preds, action_labels, target_labels, inputs) = validate(
             args,
             model,
             loaders["val"],
+            maps,
             optimizer,
             action_criterion,
             target_criterion,
@@ -409,6 +412,15 @@ def main(args):
             args.num_examples
         )
 
+        action_precision, action_recall = torchmetrics.functional.precision_recall(torch.tensor(action_preds), torch.tensor(action_labels), average="micro")
+        target_precision, target_recall = torchmetrics.functional.precision_recall(torch.tensor(target_preds), torch.tensor(target_labels), average="micro")
+
+        action_f1score = 2 * action_precision * action_recall / (action_precision + action_recall)
+        target_f1score = 2 * target_precision * target_recall / (target_precision + target_recall)
+
+        log.info("Actions precision : %0.3f | recall : %0.3f | f1-score : %0.3f", action_precision, action_recall, action_f1score)
+        log.info("Targets precision : %0.3f | recall : %0.3f | f1-score : %0.3f", target_precision, target_recall, target_f1score)
+
     else:
         train(
             args, model, loaders, maps, optimizer, action_criterion, target_criterion, device
@@ -417,16 +429,17 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--in_data_fn",       type=str,               help="data file")
-    parser.add_argument("--model_output_dir", type=str,               help="where to save model outputs")
-    parser.add_argument("--batch_size",       type=int, default=32,   help="size of each batch in loader")
-    parser.add_argument("--num_epochs",       type=int, default=1000, help="number of training epochs")
-    parser.add_argument("--val_every",        type=int, default=5,    help="number of epochs between every eval loop")
+    parser.add_argument("--in_data_fn",       type=str, required=True, help="data file")
+    parser.add_argument("--model_output_dir", type=str,                help="where to save model outputs")
+    parser.add_argument("--batch_size",       type=int, default=32,    help="size of each batch in loader")
+    parser.add_argument("--num_epochs",       type=int, default=1000,  help="number of training epochs")
+    parser.add_argument("--val_every",        type=int, default=5,     help="number of epochs between every eval loop")
     
-    parser.add_argument("--force_cpu",        action="store_true",    help="debug mode")
-    parser.add_argument("--eval",             action="store_true",    help="run eval")
-    parser.add_argument("--eval_model_id",    type=int, default=-1,   help="id of model to evaluate (default: -1, last saved model)")
-    parser.add_argument("--num_examples",     type=int, default=10,   help="number of random examples to print")
+    parser.add_argument("--force_cpu",        action="store_true",     help="debug mode")
+    parser.add_argument("--eval",             action="store_true",     help="run eval")
+    # parser.add_argument("--eval_model_id",    type=int, default=-1,    help="id of model to evaluate (default: -1, last saved model)")
+    parser.add_argument("--eval_model_path",  type=str,                help="filepath of the model to evaluate")
+    parser.add_argument("--num_examples",     type=int, default=10,    help="number of random examples to print")
 
     # ================== TODO: CODE HERE ================== #
     # Task (optional): Add any additional command line
@@ -437,6 +450,7 @@ if __name__ == "__main__":
     parser.add_argument("--emb_dim",       type=int,   required=True, help="embedding dimension")
     parser.add_argument("--lstm_dim",      type=int,   required=True, help="lstm hidden state dimension")
     parser.add_argument("--no_len_limit",  action="store_true",       help="don't limit length of inputs")
+    
     parser.add_argument("--model_type",    choices=["lstm", "attn", "act-tar", "tar-act"], default="lstm", help="specify the model architecture to use")
     parser.add_argument("--context",       choices=["curr", "prev", "next", "prev-next"], default="curr", help="specify the context to use")
 
