@@ -1,0 +1,509 @@
+2022-09-09:18:20:44 INFO     [log.py:61] Logger configured successfully
+2022-09-09:18:20:44 INFO     [train.py:446] Args:
+	in_data_fn = lang_to_sem_data.json
+	model_output_dir = None
+	batch_size = 384
+	num_epochs = 20
+	val_every = 3
+	force_cpu = False
+	eval = False
+	eval_model_id = -1
+	num_examples = 10
+	vocab_size = 1000
+	learning_rate = 0.1
+	emb_dim = 200
+	lstm_dim = 200
+	no_len_limit = True
+	model_type = attn
+	context = prev
+2022-09-09:18:20:44 INFO     [utils.py:19] Using CUDA
+2022-09-09:18:20:45 INFO     [utils.py:88] Train #episodes: 21023
+2022-09-09:18:20:45 INFO     [utils.py:89] Val #episodes: 820
+2022-09-09:18:20:56 INFO     [utils.py:144] Total instances: 476532
+2022-09-09:18:20:56 INFO     [utils.py:147] UNK tokens : 11987 / 11333699 (0.0011)     (vocab_size = 1000)
+2022-09-09:18:20:56 INFO     [utils.py:151] Cut off 24227 instances at len 42 before true ending
+2022-09-09:18:20:56 INFO     [utils.py:155] encoded 476532 instances without regard to order
+2022-09-09:18:20:56 INFO     [utils.py:144] Total instances: 19962
+2022-09-09:18:20:56 INFO     [utils.py:147] UNK tokens : 564 / 471396 (0.0012)     (vocab_size = 1000)
+2022-09-09:18:20:56 INFO     [utils.py:151] Cut off 1062 instances at len 42 before true ending
+2022-09-09:18:20:56 INFO     [utils.py:155] encoded 19962 instances without regard to order
+2022-09-09:18:20:57 INFO     [train.py:376] AttentionModel(
+  (embedding): Embedding(1000, 200, padding_idx=0)
+  (lstm): LSTM(200, 200)
+  (lstm2): LSTM(200, 200)
+  (attn): Linear(in_features=400, out_features=42, bias=True)
+  (fc_a): Linear(in_features=200, out_features=8, bias=True)
+  (fc_t): Linear(in_features=200, out_features=80, bias=True)
+)
+2022-09-09:18:22:02 INFO     [train.py:271] train action loss : 1041.0097845494747 | train target loss: 4528.256547212601
+2022-09-09:18:22:02 INFO     [train.py:274] train action acc : 0.7173033500373532 | train target acc: 0.11222751042951995
+2022-09-09:18:22:02 INFO     [train.py:300] val action loss : 16.989816263318062 | val target loss: 169.54213190078735
+2022-09-09:18:22:02 INFO     [train.py:303] val action acc : 0.8993587816852019 | val target acc: 0.1568480112213205
+2022-09-09:18:22:02 INFO     [train.py:313] Examples after 0 epochs -
+
+2022-09-09:18:22:02 INFO     [utils.py:163] input :	<start> pick up the pan from the counter <end> <start> turn left move to in front of the refrigerator <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:22:02 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:166]     true target :	fridge
+2022-09-09:18:22:02 INFO     [utils.py:167]     pred target :	sinkbasin
+2022-09-09:18:22:02 INFO     [utils.py:163] input :	<start> place the pan in the fridge and close the door wait a moment and take the pan back out <end> <start> take a few steps back until youre facing the stove again <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:22:02 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:166]     true target :	stoveburner
+2022-09-09:18:22:02 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:22:02 INFO     [utils.py:163] input :	<start> put the tomato in the microwave <end> <start> turn to the left and then the left again to face the counter <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:22:02 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:22:02 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:22:02 INFO     [utils.py:163] input :	<start> pick up the other pan on the stove top <end> <start> turn left and walk to the counter top <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:22:02 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:22:02 INFO     [utils.py:167]     pred target :	sinkbasin
+2022-09-09:18:22:02 INFO     [utils.py:163] input :	<start> turn right degrees then cross the room to the end of the couch turn right and move forward to between the coffee table and mantle then turn right to face the coffee table <end> <start> take the keys from the <end>
+2022-09-09:18:22:02 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:22:02 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:22:02 INFO     [utils.py:166]     true target :	keychain
+2022-09-09:18:22:02 INFO     [utils.py:167]     pred target :	apple
+2022-09-09:18:22:02 INFO     [utils.py:163] input :	<start> turn around to the toilet <end> <start> pick up the bottle on the toilet <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:22:02 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:22:02 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:22:02 INFO     [utils.py:166]     true target :	spraybottle
+2022-09-09:18:22:02 INFO     [utils.py:167]     pred target :	butterknife
+2022-09-09:18:22:02 INFO     [utils.py:163] input :	<start> turn around walk to dining table turn right walk past couch turn right walk forward to lamp in the left corner hold credit card up <end> <start> turn the lamp on <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:22:02 INFO     [utils.py:164]     true action :	ToggleObject
+2022-09-09:18:22:02 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:22:02 INFO     [utils.py:166]     true target :	floorlamp
+2022-09-09:18:22:02 INFO     [utils.py:167]     pred target :	apple
+2022-09-09:18:22:02 INFO     [utils.py:163] input :	<start> place the box on the table to the right of the laptop <end> <start> turn left and veer right to the right side of the tv stand <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:22:02 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:166]     true target :	dresser
+2022-09-09:18:22:02 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:22:02 INFO     [utils.py:163] input :	<start> turn around and walk to the sofa on the left <end> <start> put the book on the middle of the sofa to the right of the keys <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:22:02 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:22:02 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:22:02 INFO     [utils.py:166]     true target :	sofa
+2022-09-09:18:22:02 INFO     [utils.py:167]     pred target :	diningtable
+2022-09-09:18:22:02 INFO     [utils.py:163] input :	<start> put the book on the middle of the sofa to the right of the keys <end> <start> turn to the left walk forward turn to the left <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:22:02 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:22:02 INFO     [utils.py:166]     true target :	sidetable
+2022-09-09:18:22:02 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:23:02 INFO     [train.py:271] train action loss : 217.87117925286293 | train target loss: 3395.131689310074
+2022-09-09:18:23:02 INFO     [train.py:274] train action acc : 0.9490212619509288 | train target acc: 0.2409995551190686
+2022-09-09:18:24:06 INFO     [train.py:271] train action loss : 114.09627377428114 | train target loss: 2087.0111923217773
+2022-09-09:18:24:06 INFO     [train.py:274] train action acc : 0.9773698303576674 | train target acc: 0.5089039141127983
+2022-09-09:18:25:10 INFO     [train.py:271] train action loss : 82.810346881859 | train target loss: 1272.7076254487038
+2022-09-09:18:25:10 INFO     [train.py:274] train action acc : 0.9849370031813184 | train target acc: 0.7070081337664627
+2022-09-09:18:25:10 INFO     [train.py:300] val action loss : 6.134324390441179 | val target loss: 52.77051270008087
+2022-09-09:18:25:10 INFO     [train.py:303] val action acc : 0.9700430818555255 | val target acc: 0.716060514978459
+2022-09-09:18:25:10 INFO     [train.py:313] Examples after 3 epochs -
+
+2022-09-09:18:25:10 INFO     [utils.py:163] input :	<start> put the bowl with the tomato slice inside the refrigerator and close it <end> <start> turn right and walk to the stove then turn right and walk to the counter <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:25:10 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:25:10 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:25:10 INFO     [utils.py:166]     true target :	coffeemachine
+2022-09-09:18:25:10 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:25:10 INFO     [utils.py:163] input :	<start> turn around and walk to the desk <end> <start> place the book on the desk to the left of the alarm clock <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:25:10 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:25:10 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:25:10 INFO     [utils.py:166]     true target :	desk
+2022-09-09:18:25:10 INFO     [utils.py:167]     pred target :	desk
+2022-09-09:18:25:10 INFO     [utils.py:163] input :	<start> turn around and go to the white coffee table <end> <start> pick up the keys on the coffee table <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:25:10 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:25:10 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:25:10 INFO     [utils.py:166]     true target :	keychain
+2022-09-09:18:25:10 INFO     [utils.py:167]     pred target :	keychain
+2022-09-09:18:25:10 INFO     [utils.py:163] input :	<start> put the tomato inside the microwave on the black plate heat it for a few seconds remove it and close the door <end> <start> turn left and walk to the sink on the right <end> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:25:10 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:25:10 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:25:10 INFO     [utils.py:166]     true target :	sinkbasin
+2022-09-09:18:25:10 INFO     [utils.py:167]     pred target :	sinkbasin
+2022-09-09:18:25:10 INFO     [utils.py:163] input :	<start> put the cup down in the right side of the sink <end> <start> move to the left side of the sink <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:25:10 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:25:10 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:25:10 INFO     [utils.py:166]     true target :	butterknife
+2022-09-09:18:25:10 INFO     [utils.py:167]     pred target :	sinkbasin
+2022-09-09:18:25:10 INFO     [utils.py:163] input :	<start> pick up the apple inside the sink <end> <start> move over left to the pot on the counter <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:25:10 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:25:10 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:25:10 INFO     [utils.py:166]     true target :	pot
+2022-09-09:18:25:10 INFO     [utils.py:167]     pred target :	microwave
+2022-09-09:18:25:10 INFO     [utils.py:163] input :	<start> turn left walk forward turn to face the couch <end> <start> place the keys to the right of the other set of keys on the couch <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:25:10 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:25:10 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:25:10 INFO     [utils.py:166]     true target :	sofa
+2022-09-09:18:25:10 INFO     [utils.py:167]     pred target :	sofa
+2022-09-09:18:25:10 INFO     [utils.py:163] input :	<start> turn left and walk over to the sink <end> <start> put the butter knife in the sink and turn on the water after a couple seconds turn off the water and remove the now clean butter knife <end> <pad> <pad> <pad>
+2022-09-09:18:25:10 INFO     [utils.py:164]     true action :	CleanObject
+2022-09-09:18:25:10 INFO     [utils.py:165]     pred action :	CleanObject
+2022-09-09:18:25:10 INFO     [utils.py:166]     true target :	butterknife
+2022-09-09:18:25:10 INFO     [utils.py:167]     pred target :	butterknife
+2022-09-09:18:25:10 INFO     [utils.py:163] input :	<start> go to the fridge <end> <start> put the pan in the fridge <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:25:10 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:25:10 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:25:10 INFO     [utils.py:166]     true target :	fridge
+2022-09-09:18:25:10 INFO     [utils.py:167]     pred target :	fridge
+2022-09-09:18:25:10 INFO     [utils.py:163] input :	<start> place the remote in the box <end> <start> pick the box with the remote in it <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:25:10 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:25:10 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:25:10 INFO     [utils.py:166]     true target :	box
+2022-09-09:18:25:10 INFO     [utils.py:167]     pred target :	box
+2022-09-09:18:26:13 INFO     [train.py:271] train action loss : 65.22821190208197 | train target loss: 947.4797470569611
+2022-09-09:18:26:13 INFO     [train.py:274] train action acc : 0.9883470574903679 | train target acc: 0.7792131483300178
+2022-09-09:18:27:14 INFO     [train.py:271] train action loss : 54.82199144130573 | train target loss: 805.3549511432648
+2022-09-09:18:27:14 INFO     [train.py:274] train action acc : 0.990137073690749 | train target acc: 0.8072784199172354
+2022-09-09:18:28:18 INFO     [train.py:271] train action loss : 47.84909202950075 | train target loss: 720.5802985131741
+2022-09-09:18:28:18 INFO     [train.py:274] train action acc : 0.9912513745141984 | train target acc: 0.8248575121922557
+2022-09-09:18:28:18 INFO     [train.py:300] val action loss : 3.4533847514539957 | val target loss: 38.16350191831589
+2022-09-09:18:28:18 INFO     [train.py:303] val action acc : 0.9836188758641419 | val target acc: 0.7951107103496644
+2022-09-09:18:28:18 INFO     [train.py:313] Examples after 6 epochs -
+
+2022-09-09:18:28:18 INFO     [utils.py:163] input :	<start> turn left then walk straight to the stove <end> <start> pick up the pan on the stove <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:28:18 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:28:18 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:28:18 INFO     [utils.py:166]     true target :	pan
+2022-09-09:18:28:18 INFO     [utils.py:167]     pred target :	pan
+2022-09-09:18:28:18 INFO     [utils.py:163] input :	<start> turn to the left <end> <start> put the knife on the counter to the right of the tomato <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:28:18 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:28:18 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:28:18 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:28:18 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:28:18 INFO     [utils.py:163] input :	<start> put the knife on the table to the left of the cup <end> <start> turn around then walk across the room and turn right to face the left end of the table <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:28:18 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:28:18 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:28:18 INFO     [utils.py:166]     true target :	diningtable
+2022-09-09:18:28:18 INFO     [utils.py:167]     pred target :	diningtable
+2022-09-09:18:28:18 INFO     [utils.py:163] input :	<start> turn right go towards the couch turn right walk in front of the black desk <end> <start> put the blue vase on the desk to the right of the box <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:28:18 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:28:18 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:28:18 INFO     [utils.py:166]     true target :	desk
+2022-09-09:18:28:18 INFO     [utils.py:167]     pred target :	desk
+2022-09-09:18:28:18 INFO     [utils.py:163] input :	<start> take a half step to your left <end> <start> cut the apple in front of you into three <unk> with the knife <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:28:18 INFO     [utils.py:164]     true action :	SliceObject
+2022-09-09:18:28:18 INFO     [utils.py:165]     pred action :	SliceObject
+2022-09-09:18:28:18 INFO     [utils.py:166]     true target :	apple
+2022-09-09:18:28:18 INFO     [utils.py:167]     pred target :	apple
+2022-09-09:18:28:18 INFO     [utils.py:163] input :	<start> place the tomato in the microwave <end> <start> walk to the microwave behind you <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:28:18 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:28:18 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:28:18 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:28:18 INFO     [utils.py:167]     pred target :	microwave
+2022-09-09:18:28:18 INFO     [utils.py:163] input :	<start> put the knife in the sink <end> <start> take a step to the left and face the counter with a tomato on it <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:28:18 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:28:18 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:28:18 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:28:18 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:28:18 INFO     [utils.py:163] input :	<start> turn left walk towards the sink and find the coffee maker to the right of the sink <end> <start> pick up the cup on the coffee maker <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:28:18 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:28:18 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:28:18 INFO     [utils.py:166]     true target :	mug
+2022-09-09:18:28:18 INFO     [utils.py:167]     pred target :	mug
+2022-09-09:18:28:18 INFO     [utils.py:163] input :	<start> go straight and face the objects on the green dresser cabinets <end> <start> pick up the middle tissue box from the top of the green cabinets <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:28:18 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:28:18 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:28:18 INFO     [utils.py:166]     true target :	tissuebox
+2022-09-09:18:28:18 INFO     [utils.py:167]     pred target :	tissuebox
+2022-09-09:18:28:18 INFO     [utils.py:163] input :	<start> place the potato slice on the plate that is inside the microwave and close the door <end> <start> walk towards the small round table <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:28:18 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:28:18 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:28:18 INFO     [utils.py:166]     true target :	diningtable
+2022-09-09:18:28:18 INFO     [utils.py:167]     pred target :	diningtable
+2022-09-09:18:29:21 INFO     [train.py:271] train action loss : 42.67428758600727 | train target loss: 660.2661583721638
+2022-09-09:18:29:21 INFO     [train.py:274] train action acc : 0.9922334701552047 | train target acc: 0.8365692125607515
+2022-09-09:18:30:23 INFO     [train.py:271] train action loss : 38.2343287137337 | train target loss: 611.3486696481705
+2022-09-09:18:30:23 INFO     [train.py:274] train action acc : 0.9929763373708377 | train target acc: 0.8468707243165202
+2022-09-09:18:31:25 INFO     [train.py:271] train action loss : 34.79986375407316 | train target loss: 568.3223052620888
+2022-09-09:18:31:25 INFO     [train.py:274] train action acc : 0.9935995903737839 | train target acc: 0.8565951499584498
+2022-09-09:18:31:25 INFO     [train.py:300] val action loss : 3.5769567769020796 | val target loss: 37.8120314180851
+2022-09-09:18:31:25 INFO     [train.py:303] val action acc : 0.9841198276725779 | val target acc: 0.7905520488928965
+2022-09-09:18:31:25 INFO     [train.py:313] Examples after 9 epochs -
+
+2022-09-09:18:31:25 INFO     [utils.py:163] input :	<start> place the box on the table to the right of the laptop <end> <start> turn left and veer right to the right side of the tv stand <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:31:25 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:31:25 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:31:25 INFO     [utils.py:166]     true target :	dresser
+2022-09-09:18:31:25 INFO     [utils.py:167]     pred target :	dresser
+2022-09-09:18:31:25 INFO     [utils.py:163] input :	<start> put tomato in the microwave and cook it take tomato out of microwave <end> <start> turn away from counter turn back to face counter <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:31:25 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:31:25 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:31:25 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:31:25 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:31:25 INFO     [utils.py:163] input :	<start> take the knife from the fridge <end> <start> slice lettuce in the fridge <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:31:25 INFO     [utils.py:164]     true action :	SliceObject
+2022-09-09:18:31:25 INFO     [utils.py:165]     pred action :	SliceObject
+2022-09-09:18:31:25 INFO     [utils.py:166]     true target :	lettuce
+2022-09-09:18:31:25 INFO     [utils.py:167]     pred target :	lettuce
+2022-09-09:18:31:25 INFO     [utils.py:163] input :	<start> put the heated egg back in the fridge <end> <start> walk over to the fridge <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:31:25 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:31:25 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:31:25 INFO     [utils.py:166]     true target :	fridge
+2022-09-09:18:31:25 INFO     [utils.py:167]     pred target :	fridge
+2022-09-09:18:31:25 INFO     [utils.py:163] input :	<start> pick up the bar of soap out of the small red bin <end> <start> turn right and walk forward then turn left and walk up to the counter <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:31:25 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:31:25 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:31:25 INFO     [utils.py:166]     true target :	sinkbasin
+2022-09-09:18:31:25 INFO     [utils.py:167]     pred target :	sinkbasin
+2022-09-09:18:31:25 INFO     [utils.py:163] input :	<start> walk forward to the wall then turn right to face the left end of the white table <end> <start> pick up the knife on the white table <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:31:25 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:31:25 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:31:25 INFO     [utils.py:166]     true target :	butterknife
+2022-09-09:18:31:25 INFO     [utils.py:167]     pred target :	butterknife
+2022-09-09:18:31:25 INFO     [utils.py:163] input :	<start> <end> <start> turn right and take a step forward then turn right again and walk up to the counter to the left of the oven <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:31:25 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:31:25 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:31:25 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:31:25 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:31:25 INFO     [utils.py:163] input :	<start> turn left go forward to the tub turn right go forward to the trash bin <end> <start> take the green spray bottle from the trash bin <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:31:25 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:31:25 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:31:25 INFO     [utils.py:166]     true target :	spraybottle
+2022-09-09:18:31:25 INFO     [utils.py:167]     pred target :	spraybottle
+2022-09-09:18:31:25 INFO     [utils.py:163] input :	<start> go back to the toilet <end> <start> place the tissue box vertically <unk> on top of the toilet tank behind the first tissue box <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:31:25 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:31:25 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:31:25 INFO     [utils.py:166]     true target :	toilet
+2022-09-09:18:31:25 INFO     [utils.py:167]     pred target :	toilet
+2022-09-09:18:31:25 INFO     [utils.py:163] input :	<start> go to the left side of the table <end> <start> slice the bread on the table <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:31:25 INFO     [utils.py:164]     true action :	SliceObject
+2022-09-09:18:31:25 INFO     [utils.py:165]     pred action :	SliceObject
+2022-09-09:18:31:25 INFO     [utils.py:166]     true target :	bread
+2022-09-09:18:31:25 INFO     [utils.py:167]     pred target :	bread
+2022-09-09:18:32:29 INFO     [train.py:271] train action loss : 31.806304290657863 | train target loss: 533.5920447409153
+2022-09-09:18:32:29 INFO     [train.py:274] train action acc : 0.9940486682950987 | train target acc: 0.8637678057297307
+2022-09-09:18:33:32 INFO     [train.py:271] train action loss : 28.917199888732284 | train target loss: 499.28011134266853
+2022-09-09:18:33:32 INFO     [train.py:274] train action acc : 0.9946257544089379 | train target acc: 0.8721470961026752
+2022-09-09:18:34:34 INFO     [train.py:271] train action loss : 26.526393191423267 | train target loss: 468.70550402998924
+2022-09-09:18:34:34 INFO     [train.py:274] train action acc : 0.9950013850066732 | train target acc: 0.8792672894999706
+2022-09-09:18:34:34 INFO     [train.py:300] val action loss : 3.8573584174737334 | val target loss: 39.96114903688431
+2022-09-09:18:34:34 INFO     [train.py:303] val action acc : 0.9842701132151087 | val target acc: 0.7834385332131049
+2022-09-09:18:34:34 INFO     [train.py:313] Examples after 12 epochs -
+
+2022-09-09:18:34:34 INFO     [utils.py:163] input :	<start> turn right and head towards the bed table <end> <start> drop the clock on the bed table <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:34:34 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:34:34 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:34:34 INFO     [utils.py:166]     true target :	dresser
+2022-09-09:18:34:34 INFO     [utils.py:167]     pred target :	sidetable
+2022-09-09:18:34:34 INFO     [utils.py:163] input :	<start> turn around and go to the stove ahead turn left and go forward then turn right to face the trash bin <end> <start> put the tomato in the trash bin <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:34:34 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:34:34 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:34:34 INFO     [utils.py:166]     true target :	garbagecan
+2022-09-09:18:34:34 INFO     [utils.py:167]     pred target :	garbagecan
+2022-09-09:18:34:34 INFO     [utils.py:163] input :	<start> close the refrigerator <end> <start> back up turn around to the left walk around the island to the very end <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:34:34 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:34:34 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:34:34 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:34:34 INFO     [utils.py:167]     pred target :	diningtable
+2022-09-09:18:34:34 INFO     [utils.py:163] input :	<start> place the hand towel in the middle of the tub <end> <start> move to the left and face the white towel hanging to the right of the mirror <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:34:34 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:34:34 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:34:34 INFO     [utils.py:166]     true target :	handtowelholder
+2022-09-09:18:34:34 INFO     [utils.py:167]     pred target :	handtowelholder
+2022-09-09:18:34:34 INFO     [utils.py:163] input :	<start> move forward and turn right at the island and face it on the right <end> <start> pick up the egg from the right side but closer to the loaf of bread <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:34:34 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:34:34 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:34:34 INFO     [utils.py:166]     true target :	egg
+2022-09-09:18:34:34 INFO     [utils.py:167]     pred target :	egg
+2022-09-09:18:34:34 INFO     [utils.py:163] input :	<start> pick up the tall statue at the back right corner of the table <end> <start> turn around and walk to the small table next to the couch <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:34:34 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:34:34 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:34:34 INFO     [utils.py:166]     true target :	desklamp
+2022-09-09:18:34:34 INFO     [utils.py:167]     pred target :	sidetable
+2022-09-09:18:34:34 INFO     [utils.py:163] input :	<start> turn left and walk towards the counter at the end <end> <start> open the cabinet below the counter and place the plate in it <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:34:34 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:34:34 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:34:34 INFO     [utils.py:166]     true target :	cabinet
+2022-09-09:18:34:34 INFO     [utils.py:167]     pred target :	cabinet
+2022-09-09:18:34:34 INFO     [utils.py:163] input :	<start> <end> <start> turn left and walk halfway across the room until you are even with the stove then turn right and walk to the stove so you are facing the front of it <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:34:34 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:34:34 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:34:34 INFO     [utils.py:166]     true target :	stoveburner
+2022-09-09:18:34:34 INFO     [utils.py:167]     pred target :	stoveburner
+2022-09-09:18:34:34 INFO     [utils.py:163] input :	<start> turn right and walk forward to the wooden shelf <end> <start> pick up the round plate from the top shelf <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:34:34 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:34:34 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:34:34 INFO     [utils.py:166]     true target :	plate
+2022-09-09:18:34:34 INFO     [utils.py:167]     pred target :	plate
+2022-09-09:18:34:34 INFO     [utils.py:163] input :	<start> turn around and step forward then turn left and go center of the room and turn left in front of the sofa <end> <start> place the key on the sofa to the bottom right of the laptop <end> <pad> <pad> <pad>
+2022-09-09:18:34:34 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:34:34 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:34:34 INFO     [utils.py:166]     true target :	sofa
+2022-09-09:18:34:34 INFO     [utils.py:167]     pred target :	sofa
+2022-09-09:18:35:38 INFO     [train.py:271] train action loss : 24.532514650840312 | train target loss: 442.97148092091084
+2022-09-09:18:35:38 INFO     [train.py:274] train action acc : 0.9953455381800173 | train target acc: 0.8857747223691169
+2022-09-09:18:36:42 INFO     [train.py:271] train action loss : 22.686871100682765 | train target loss: 417.2765756994486
+2022-09-09:18:36:42 INFO     [train.py:274] train action acc : 0.9956687064037673 | train target acc: 0.8919694794893103
+2022-09-09:18:37:44 INFO     [train.py:271] train action loss : 21.05160378338769 | train target loss: 392.71890918910503
+2022-09-09:18:37:44 INFO     [train.py:274] train action acc : 0.9959876776375983 | train target acc: 0.8980383269119387
+2022-09-09:18:37:45 INFO     [train.py:300] val action loss : 4.064099846407771 | val target loss: 40.86459797620773
+2022-09-09:18:37:45 INFO     [train.py:303] val action acc : 0.9843202083959524 | val target acc: 0.7888989079250576
+2022-09-09:18:37:45 INFO     [train.py:313] Examples after 15 epochs -
+
+2022-09-09:18:37:45 INFO     [utils.py:163] input :	<start> turn to your right and walk to the microwave on the kitchen counter across from you <end> <start> place the apple in the microwave heat it up then remove the apple from the microwave <end> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:37:45 INFO     [utils.py:164]     true action :	HeatObject
+2022-09-09:18:37:45 INFO     [utils.py:165]     pred action :	HeatObject
+2022-09-09:18:37:45 INFO     [utils.py:166]     true target :	apple
+2022-09-09:18:37:45 INFO     [utils.py:167]     pred target :	apple
+2022-09-09:18:37:45 INFO     [utils.py:163] input :	<start> turn to the left and cross the room before turning to the right to face the couch <end> <start> look up to turn off the lamp <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:37:45 INFO     [utils.py:164]     true action :	ToggleObject
+2022-09-09:18:37:45 INFO     [utils.py:165]     pred action :	ToggleObject
+2022-09-09:18:37:45 INFO     [utils.py:166]     true target :	floorlamp
+2022-09-09:18:37:45 INFO     [utils.py:167]     pred target :	floorlamp
+2022-09-09:18:37:45 INFO     [utils.py:163] input :	<start> pick up a slice of the tomato <end> <start> move to the middle of the sink and look up <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:37:45 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:37:45 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:37:45 INFO     [utils.py:166]     true target :	microwave
+2022-09-09:18:37:45 INFO     [utils.py:167]     pred target :	sinkbasin
+2022-09-09:18:37:45 INFO     [utils.py:163] input :	<start> take a step backwards <end> <start> open the left cabinet below the sink and place the knife on the plate <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:37:45 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:37:45 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:37:45 INFO     [utils.py:166]     true target :	cabinet
+2022-09-09:18:37:45 INFO     [utils.py:167]     pred target :	cabinet
+2022-09-09:18:37:45 INFO     [utils.py:163] input :	<start> place the tomato in the microwave and remove after heating <end> <start> after closing the microwave head back to the refrigerator <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:37:45 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:37:45 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:37:45 INFO     [utils.py:166]     true target :	fridge
+2022-09-09:18:37:45 INFO     [utils.py:167]     pred target :	fridge
+2022-09-09:18:37:45 INFO     [utils.py:163] input :	<start> put tomato in the microwave and cook it take tomato out of microwave <end> <start> turn away from counter turn back to face counter <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:37:45 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:37:45 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:37:45 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:37:45 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:37:45 INFO     [utils.py:163] input :	<start> grab the yellow spray bottle and walk it over to the toilet <end> <start> put the yellow spray bottle on the back of the toilet <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:37:45 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:37:45 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:37:45 INFO     [utils.py:166]     true target :	toilet
+2022-09-09:18:37:45 INFO     [utils.py:167]     pred target :	toilet
+2022-09-09:18:37:45 INFO     [utils.py:163] input :	<start> pick up a slice of tomato from the counter <end> <start> turn right move to the counter in front of the stove <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:37:45 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:37:45 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:37:45 INFO     [utils.py:166]     true target :	microwave
+2022-09-09:18:37:45 INFO     [utils.py:167]     pred target :	microwave
+2022-09-09:18:37:45 INFO     [utils.py:163] input :	<start> grab the knife from the sink <end> <start> turn right and walk to the refrigerator <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:37:45 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:37:45 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:37:45 INFO     [utils.py:166]     true target :	lettuce
+2022-09-09:18:37:45 INFO     [utils.py:167]     pred target :	lettuce
+2022-09-09:18:37:45 INFO     [utils.py:163] input :	<start> move right to the front of the microwave above the stove <end> <start> put the knife in the microwave <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:37:45 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:37:45 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:37:45 INFO     [utils.py:166]     true target :	microwave
+2022-09-09:18:37:45 INFO     [utils.py:167]     pred target :	microwave
+2022-09-09:18:38:46 INFO     [train.py:271] train action loss : 19.322368530440144 | train target loss: 370.64963549375534
+2022-09-09:18:38:46 INFO     [train.py:274] train action acc : 0.9962709744571193 | train target acc: 0.9032656778558418
+2022-09-09:18:39:48 INFO     [train.py:271] train action loss : 17.583822237094864 | train target loss: 346.7906342893839
+2022-09-09:18:39:48 INFO     [train.py:274] train action acc : 0.9965353848220057 | train target acc: 0.909575852198803
+2022-09-09:18:40:52 INFO     [train.py:271] train action loss : 16.591938450816087 | train target loss: 323.1672507226467
+2022-09-09:18:40:52 INFO     [train.py:274] train action acc : 0.9967095599036371 | train target acc: 0.9161903083108794
+2022-09-09:18:40:53 INFO     [train.py:300] val action loss : 4.176347760017961 | val target loss: 43.356975734233856
+2022-09-09:18:40:53 INFO     [train.py:303] val action acc : 0.9848712553852319 | val target acc: 0.792505760945797
+2022-09-09:18:40:53 INFO     [train.py:313] Examples after 18 epochs -
+
+2022-09-09:18:40:53 INFO     [utils.py:163] input :	<start> pick up the vase on the counter <end> <start> take a step to the left and place the vase on the <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:40:53 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:40:53 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:40:53 INFO     [utils.py:166]     true target :	shelf
+2022-09-09:18:40:53 INFO     [utils.py:167]     pred target :	diningtable
+2022-09-09:18:40:53 INFO     [utils.py:163] input :	<start> take the pan with the tomato from the stove in front of you <end> <start> turn right and face the fridge on your left <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:40:53 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:40:53 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:40:53 INFO     [utils.py:166]     true target :	fridge
+2022-09-09:18:40:53 INFO     [utils.py:167]     pred target :	fridge
+2022-09-09:18:40:53 INFO     [utils.py:163] input :	<start> go left to cross the room and then turn left again to face the microwave <end> <start> put the tomato into the microwave and turn it on and then off and take the tomato out and shut the door <end> <pad>
+2022-09-09:18:40:53 INFO     [utils.py:164]     true action :	HeatObject
+2022-09-09:18:40:53 INFO     [utils.py:165]     pred action :	HeatObject
+2022-09-09:18:40:53 INFO     [utils.py:166]     true target :	tomato
+2022-09-09:18:40:53 INFO     [utils.py:167]     pred target :	tomato
+2022-09-09:18:40:53 INFO     [utils.py:163] input :	<start> pick up the pan with the chunk of apple in it <end> <start> turn left and take a step then turn left and walk to the fridge <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:40:53 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:40:53 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:40:53 INFO     [utils.py:166]     true target :	fridge
+2022-09-09:18:40:53 INFO     [utils.py:167]     pred target :	fridge
+2022-09-09:18:40:53 INFO     [utils.py:163] input :	<start> move to the tv stand to the left of you <end> <start> put the watch on the stand <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:40:53 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:40:53 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:40:53 INFO     [utils.py:166]     true target :	dresser
+2022-09-09:18:40:53 INFO     [utils.py:167]     pred target :	plate
+2022-09-09:18:40:53 INFO     [utils.py:163] input :	<start> go to the counter <end> <start> pick up an apple slice on the counter <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:40:53 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:40:53 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:40:53 INFO     [utils.py:166]     true target :	apple
+2022-09-09:18:40:53 INFO     [utils.py:167]     pred target :	apple
+2022-09-09:18:40:53 INFO     [utils.py:163] input :	<start> turn around and walk to the white stove on the right <end> <start> put the tomato inside the microwave above the stove and close the door <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:40:53 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:40:53 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:40:53 INFO     [utils.py:166]     true target :	microwave
+2022-09-09:18:40:53 INFO     [utils.py:167]     pred target :	microwave
+2022-09-09:18:40:53 INFO     [utils.py:163] input :	<start> place the tomato inside of the fridge there <end> <start> turn around and go to the fridge ahead <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:40:53 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:40:53 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:40:53 INFO     [utils.py:166]     true target :	fridge
+2022-09-09:18:40:53 INFO     [utils.py:167]     pred target :	fridge
+2022-09-09:18:40:53 INFO     [utils.py:163] input :	<start> turn to the left and walk three steps turn right at the red chair for three steps take a left for seven steps turn left again for five steps turn right and walk three steps to the tv stand <end> <end>
+2022-09-09:18:40:53 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:40:53 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:40:53 INFO     [utils.py:166]     true target :	dresser
+2022-09-09:18:40:53 INFO     [utils.py:167]     pred target :	keychain
+2022-09-09:18:40:53 INFO     [utils.py:163] input :	<start> turn around and walk across the room to face the right side of the sink <end> <start> pick up the soap in the cabinet under the left side of the right sink <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:40:53 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:40:53 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:40:53 INFO     [utils.py:166]     true target :	soapbar
+2022-09-09:18:40:53 INFO     [utils.py:167]     pred target :	soapbar
+2022-09-09:18:41:55 INFO     [train.py:271] train action loss : 15.458573558717035 | train target loss: 305.8984415978193
+2022-09-09:18:41:55 INFO     [train.py:274] train action acc : 0.9969131139147004 | train target acc: 0.9203516238153996
+2022-09-09:18:41:56 INFO     [train.py:300] val action loss : 4.288334248587489 | val target loss: 44.626720547676086
+2022-09-09:18:41:56 INFO     [train.py:303] val action acc : 0.9834184951407675 | val target acc: 0.7795812042881475
+2022-09-09:18:41:56 INFO     [train.py:313] Examples after 19 epochs -
+
+2022-09-09:18:41:56 INFO     [utils.py:163] input :	<start> place the bar of soap in the tub <end> <start> move to stand in front of the bathroom sink <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:41:56 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:41:56 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:41:56 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:41:56 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:41:56 INFO     [utils.py:163] input :	<start> above the sink open the microwave door put the tomato slice in front of the mug close the door and microwave the slice for a few seconds take out the tomato slice and close the door <end> <start> move slightly <end>
+2022-09-09:18:41:56 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:41:56 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:41:56 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:41:56 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:41:56 INFO     [utils.py:163] input :	<start> turn right move forward turn left then move forward and to approach the microwave <end> <start> cook the apple in the microwave <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:41:56 INFO     [utils.py:164]     true action :	HeatObject
+2022-09-09:18:41:56 INFO     [utils.py:165]     pred action :	HeatObject
+2022-09-09:18:41:56 INFO     [utils.py:166]     true target :	apple
+2022-09-09:18:41:56 INFO     [utils.py:167]     pred target :	apple
+2022-09-09:18:41:56 INFO     [utils.py:163] input :	<start> turn around and go to the front of the refrigerator <end> <start> chill the tomato in the refrigerator and take it out <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:41:56 INFO     [utils.py:164]     true action :	CoolObject
+2022-09-09:18:41:56 INFO     [utils.py:165]     pred action :	CoolObject
+2022-09-09:18:41:56 INFO     [utils.py:166]     true target :	tomato
+2022-09-09:18:41:56 INFO     [utils.py:167]     pred target :	tomato
+2022-09-09:18:41:56 INFO     [utils.py:163] input :	<start> turn around and take the yellow vase to the table to your left <end> <start> place the yellow vase next to the blue vase on the table <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:41:56 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:41:56 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:41:56 INFO     [utils.py:166]     true target :	desk
+2022-09-09:18:41:56 INFO     [utils.py:167]     pred target :	diningtable
+2022-09-09:18:41:56 INFO     [utils.py:163] input :	<start> turn left then walk straight to the stove <end> <start> pick up the pan on the stove <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:41:56 INFO     [utils.py:164]     true action :	PickupObject
+2022-09-09:18:41:56 INFO     [utils.py:165]     pred action :	PickupObject
+2022-09-09:18:41:56 INFO     [utils.py:166]     true target :	pan
+2022-09-09:18:41:56 INFO     [utils.py:167]     pred target :	pan
+2022-09-09:18:41:56 INFO     [utils.py:163] input :	<start> pick up the near pillow <end> <start> turn right move to the night stand that is right of the bed <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:41:56 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:41:56 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:41:56 INFO     [utils.py:166]     true target :	desklamp
+2022-09-09:18:41:56 INFO     [utils.py:167]     pred target :	desklamp
+2022-09-09:18:41:56 INFO     [utils.py:163] input :	<start> cut the apple into three slices <end> <start> place the knife onto the counter <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:41:56 INFO     [utils.py:164]     true action :	PutObject
+2022-09-09:18:41:56 INFO     [utils.py:165]     pred action :	PutObject
+2022-09-09:18:41:56 INFO     [utils.py:166]     true target :	countertop
+2022-09-09:18:41:56 INFO     [utils.py:167]     pred target :	countertop
+2022-09-09:18:41:56 INFO     [utils.py:163] input :	<start> open the fridge and place the bread in the fridge take out the bread <end> <start> turn around completely and walk back to the table <end> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad> <pad>
+2022-09-09:18:41:56 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:41:56 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:41:56 INFO     [utils.py:166]     true target :	diningtable
+2022-09-09:18:41:56 INFO     [utils.py:167]     pred target :	diningtable
+2022-09-09:18:41:56 INFO     [utils.py:163] input :	<start> open the fridge and put the bottle in the fridge and close the fridge and wait to get it cold <end> <start> open the fridge and take out the bottle then turn right towards the white table on your left <end>
+2022-09-09:18:41:56 INFO     [utils.py:164]     true action :	GotoLocation
+2022-09-09:18:41:56 INFO     [utils.py:165]     pred action :	GotoLocation
+2022-09-09:18:41:56 INFO     [utils.py:166]     true target :	diningtable
+2022-09-09:18:41:56 INFO     [utils.py:167]     pred target :	garbagecan

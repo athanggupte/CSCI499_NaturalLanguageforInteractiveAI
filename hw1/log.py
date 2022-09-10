@@ -4,9 +4,9 @@ import os
 from datetime import datetime
 
 LOGGER_NAME = 'athang213'
-LOG_FILE_NAME = ''
+log_filename = ''
 
-def next_path(path_pattern):
+def _next_path(path_pattern):
     """
     Finds the next free path in an sequentially named list of files
 
@@ -31,13 +31,18 @@ def next_path(path_pattern):
         c = (a + b) // 2 # interval midpoint
         a, b = (c, b) if os.path.exists(path_pattern % c) else (a, c)
 
-    return path_pattern % b
+    return b
 
+def next_path(path_pattern):
+    return path_pattern % _next_path(path_pattern)
+
+def last_path(path_pattern):
+    return path_pattern & (_next_path(path_pattern) - 1)
 
 def setup_logging():
     filepath = next_path("logs/run-%s.log")
-    global LOG_FILE_NAME
-    LOG_FILE_NAME = filepath.split('/')[-1]
+    global log_filename
+    log_filename = filepath.split('/')[-1]
 
     log = logging.getLogger(LOGGER_NAME)
     formatter = logging.Formatter(

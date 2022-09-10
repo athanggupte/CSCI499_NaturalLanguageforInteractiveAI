@@ -16,11 +16,11 @@ def get_device(force_cpu, status=True):
     if not force_cpu and torch.cuda.is_available():
         device = torch.device("cuda")
         if status:
-            print("Using CUDA")
+            log.info("Using CUDA")
     else:
         device = torch.device("cpu")
         if status:
-            print("Using CPU")
+            log.info("Using CPU")
     return device
 
 
@@ -60,7 +60,8 @@ def build_tokenizer_table(train, vocab_size=1000):
     return (
         vocab_to_index,
         index_to_vocab,
-        int(np.average(padded_lens) + np.std(padded_lens) * 2 + 0.5),
+        # int(np.average(padded_lens) + np.std(padded_lens) * 2 + 0.5),
+        # int(np.max(padded_lens))
     )
 
 
@@ -88,14 +89,27 @@ def extract_episodes_from_json(filename):
         log.info("Val #episodes: %d" % len(val_data))
         return train_data, val_data
 
-def flatten_episodes(episodes):
+def flatten_episodes(episodes, context):
     data = []
+    padded_lens = []
     for episode in episodes:
-        for inst, outseq in episode:
+        for i, (inst, outseq) in enumerate(episode):
             inst = preprocess_string(inst).lower()
             action, target = outseq
+            
+            if context != "curr":
+                prev = ("" if i == 0 else preprocess_string(episode[i-1][0]).lower() + " ") + "<end> <start> "
+                next = " <end> <start>" + ("" if i == len(episode) - 1 else " " + preprocess_string(episode[i+1][0]).lower())
+
+                if "prev" in context:
+                    inst = prev + inst
+                if "next" in context:
+                    inst = inst + next
+            
+            padded_len = len([ word for word in inst.split() if len(word) > 0 ])
+            padded_lens.append(padded_len + 2)
             data.append((inst, action, target))
-    return data
+    return data, int(np.average(padded_lens) + np.std(padded_lens) * 2 + 0.5),
 
 def encode_data(data, v2i, a2i, t2i, seq_len=0):
     n_data = len(data)
@@ -108,7 +122,7 @@ def encode_data(data, v2i, a2i, t2i, seq_len=0):
     n_unks = 0
     n_early_cutoffs = 0
     for inst, action, target in data:
-        inst = preprocess_string(inst)
+        # inst = preprocess_string(inst)
         tokens = inst.split()
         tkn_idx = [ v2i['<start>'] ]
         for word in tokens:
@@ -131,11 +145,20 @@ def encode_data(data, v2i, a2i, t2i, seq_len=0):
         "UNK tokens : %d / %d (%.4f)     (vocab_size = %d)"
         % (n_unks, n_tokens, n_unks/n_tokens, len(v2i))
     )
-    # log.info(
-    #     "Cut off %d instances at len %d before true ending"
-    #     % (n_early_cutoffs, seq_len)
-    # )
+    log.info(
+        "Cut off %d instances at len %d before true ending"
+        % (n_early_cutoffs, seq_len)
+    )
     log.info(
         "encoded %d instances without regard to order" % idx
     )
     return x, y
+
+def log_examples(inputs, action_preds, action_labels, target_preds, target_labels, index_to_vocab, index_to_actions, index_to_targets, num_examples=10):
+    k_random_samples = np.random.choice(len(inputs), size=num_examples, replace=False)
+    for idx in k_random_samples:
+        log.info("input :\t%s" % ' '.join([index_to_vocab[i] for i in inputs[idx].tolist()]))
+        log.info("    true action :\t%s" % index_to_actions[action_labels[idx]])
+        log.info("    pred action :\t%s" % index_to_actions[action_preds[idx]])
+        log.info("    true target :\t%s" % index_to_targets[target_labels[idx]])
+        log.info("    pred target :\t%s" % index_to_targets[target_preds[idx]])

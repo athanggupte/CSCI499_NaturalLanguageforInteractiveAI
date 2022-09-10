@@ -1,0 +1,13 @@
+2022-09-09:14:35:41 INFO     [log.py:61] Logger configured successfully
+2022-09-09:14:35:42 INFO     [utils.py:88] Train #episodes: 21023
+2022-09-09:14:35:42 INFO     [utils.py:89] Val #episodes: 820
+2022-09-09:14:35:46 INFO     [my-test.py:24] Args:
+	in_data_fn = lang_to_sem_data.json
+	vocab_size = 10000
+	batch_size = 32
+	emb_dim = 120
+	lstm_dim = 120
+	context = prev-next
+2022-09-09:14:35:46 DEBUG    [my-test.py:26] train_data[0]  : ('<end> <start> walk straight turn left to the counter <end> <start> pick up the knife on the table', 'GotoLocation', 'diningtable')
+2022-09-09:14:35:46 DEBUG    [my-test.py:27] train_data[1]  : ('walk straight turn left to the counter <end> <start> pick up the knife on the table <end> <start> slice the green vegetable on the table', 'PickupObject', 'knife')
+2022-09-09:14:35:46 DEBUG    [my-test.py:28] train_data[32] : ('turn right and carry the lettuce to stand back in front of the table <end> <start> place the cold lettuce slice on the table in front of the rest of the head of lettuce <end> <start>', 'PutObject', 'diningtable')

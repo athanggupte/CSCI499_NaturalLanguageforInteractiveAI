@@ -1,20 +1,22 @@
 # import logging
+from cProfile import label
 import csv
 from datautil import IndexedDataset, get_dataloader
-from log import LOG_FILE_NAME, setup_logging, get_logger
+from log import log_filename, next_path, setup_logging, get_logger, last_path
 import tqdm
 import torch
 import numpy as np
 import argparse
 from sklearn.metrics import accuracy_score
 from matplotlib import pyplot as plt
-from model import Model
+from model import ActionToTargetModel, AttentionModel, Model, TargetToActionModel
 
 from utils import (
     encode_data,
     flatten_episodes,
     get_device,
     extract_episodes_from_json,
+    log_examples,
     preprocess_string,
     build_tokenizer_table,
     build_output_tables,
@@ -42,15 +44,20 @@ def setup_dataloader(args):
     # Hint: use the helper functions provided in utils.py
     # ===================================================== #
     train_eps, val_eps = extract_episodes_from_json(args.in_data_fn)
-    train_data = flatten_episodes(train_eps)
-    val_data = flatten_episodes(val_eps)
+    train_data, len_cutoff = flatten_episodes(train_eps, args.context)
+    val_data, _ = flatten_episodes(val_eps, args.context)
 
-    vocab_to_index, index_to_vocab, len_cutoff = build_tokenizer_table(train_eps, vocab_size=args.vocab_size)
+    vocab_to_index, index_to_vocab = build_tokenizer_table(train_eps, vocab_size=args.vocab_size)
     actions_to_index, index_to_actions, targets_to_index, index_to_targets = build_output_tables(train_eps)
 
-    with open("vocab.csv", "w") as f:
-        for word, idx in vocab_to_index.items():
-            f.write("%s, %d\n" % (word, idx))
+    # with open("vocab.csv", "w") as f:
+    #     for word, idx in vocab_to_index.items():
+    #         f.write("%s, %d\n" % (word, idx))
+
+    if args.model_type in ["lstm", "act-tar", "tar-act"]:
+        len_cutoff = 0 if args.no_len_limit else len_cutoff
+    # else:
+    #     len_cutoff = max_len if args.no_len_limit else len_cutoff
 
     train_np_x, train_np_y = encode_data(train_data, vocab_to_index, actions_to_index, targets_to_index, len_cutoff)
     train_dataset = IndexedDataset([torch.from_numpy(xi) for xi in train_np_x], torch.from_numpy(train_np_y))
@@ -60,10 +67,11 @@ def setup_dataloader(args):
 
     train_loader = get_dataloader(train_dataset, batch_size=args.batch_size, shuffle=True)
     val_loader = get_dataloader(val_dataset, batch_size=args.batch_size, shuffle=True)
-    return train_loader, val_loader, (vocab_to_index, index_to_vocab, actions_to_index, index_to_actions, targets_to_index, index_to_targets)
+
+    return train_loader, val_loader, (vocab_to_index, index_to_vocab, actions_to_index, index_to_actions, targets_to_index, index_to_targets), len_cutoff
 
 
-def setup_model(args, device, vocab_to_index, actions_to_index, targets_to_index):
+def setup_model(args, device, max_len, vocab_to_index, actions_to_index, targets_to_index):
     """
     return:
         - model: YourOwnModelClass
@@ -71,13 +79,38 @@ def setup_model(args, device, vocab_to_index, actions_to_index, targets_to_index
     # ================== TODO: CODE HERE ================== #
     # Task: Initialize your model.
     # ===================================================== #
-    model = Model(device,
-            vocab_size=len(vocab_to_index),
-            n_actions=len(actions_to_index),
-            n_targets=len(targets_to_index),
-            embedding_dim=args.emb_dim,
-            lstm_hidden_dim=args.lstm_dim
-        )
+    if args.model_type == "lstm":
+        model = Model(device, max_len,
+                vocab_size=len(vocab_to_index),
+                n_actions=len(actions_to_index),
+                n_targets=len(targets_to_index),
+                embedding_dim=args.emb_dim,
+                lstm_hidden_dim=args.lstm_dim
+            )
+    elif args.model_type == "attn":
+        model = AttentionModel(device, max_len,
+                vocab_size=len(vocab_to_index),
+                n_actions=len(actions_to_index),
+                n_targets=len(targets_to_index),
+                embedding_dim=args.emb_dim,
+                lstm_hidden_dim=args.lstm_dim
+            )
+    elif args.model_type == "act-tar":
+        model = ActionToTargetModel(device, max_len,
+                vocab_size=len(vocab_to_index),
+                n_actions=len(actions_to_index),
+                n_targets=len(targets_to_index),
+                embedding_dim=args.emb_dim,
+                lstm_hidden_dim=args.lstm_dim
+            )
+    elif args.model_type == "tar-act":
+        model = TargetToActionModel(device, max_len,
+                vocab_size=len(vocab_to_index),
+                n_actions=len(actions_to_index),
+                n_targets=len(targets_to_index),
+                embedding_dim=args.emb_dim,
+                lstm_hidden_dim=args.lstm_dim
+            )
     return model
 
 
@@ -117,6 +150,9 @@ def train_epoch(
     target_preds = []
     action_labels = []
     target_labels = []
+    
+    # keep track of inputs, preds and labels for evaluation (only for validation)
+    val_inputs = []
 
     # iterate over each batch in the dataloader
     # NOTE: you may have additional outputs from the loader __getitem__, you can modify this
@@ -156,6 +192,7 @@ def train_epoch(
         target_preds.extend(target_preds_.cpu().numpy())
         action_labels.extend(labels[:, 0].cpu().numpy())
         target_labels.extend(labels[:, 1].cpu().numpy())
+        val_inputs.extend(inputs[:].cpu().numpy())
 
     action_acc = accuracy_score(action_preds, action_labels)
     target_acc = accuracy_score(target_preds, target_labels)
@@ -163,7 +200,7 @@ def train_epoch(
     if training:
         return epoch_action_loss, epoch_target_loss, action_acc, target_acc
     else:
-        return epoch_action_loss, epoch_target_loss, action_acc, target_acc, (action_preds, target_preds, action_labels, target_labels)
+        return epoch_action_loss, epoch_target_loss, action_acc, target_acc, (action_preds, target_preds, action_labels, target_labels, val_inputs)
 
 
 def validate(
@@ -194,6 +231,8 @@ def train(args, model, loaders, maps, optimizer, action_criterion, target_criter
     # In each epoch we compute loss on each sample in our dataset and update the model
     # weights via backpropagation
     model.train()
+
+    model_filepath = next_path("models/model-%s.pt")
 
     # maps
     vocab_to_index, index_to_vocab, actions_to_index, index_to_actions, targets_to_index, index_to_targets = maps
@@ -244,8 +283,8 @@ def train(args, model, loaders, maps, optimizer, action_criterion, target_criter
         # run validation every so often
         # during eval, we run a forward pass through the model and compute
         # loss and accuracy but we don't update the model weights
-        if epoch % args.val_every == 0:
-            val_action_loss, val_target_loss, val_action_acc, val_target_acc, (action_preds, target_preds, action_labels, target_labels) = validate(
+        if epoch % args.val_every == 0 or epoch == args.num_epochs - 1:
+            val_action_loss, val_target_loss, val_action_acc, val_target_acc, (action_preds, target_preds, action_labels, target_labels, inputs) = validate(
                 args,
                 model,
                 loaders["val"],
@@ -271,11 +310,19 @@ def train(args, model, loaders, maps, optimizer, action_criterion, target_criter
             val_target_accs.append(val_target_acc)
 
             # show k random examples
-            log_str = "Examples after %d epochs -\n" % epoch
-            k_random_samples = np.random.choice(len(loaders["val"].dataset), size=10, replace=False)
-            for idx in k_random_samples:
-                log_str += "input :\t%s" % ' '.join([])
-                action_preds
+            log.info("Examples after %d epochs -\n" % epoch)
+            log_examples(
+                inputs,
+                action_preds, action_labels,
+                target_preds, target_labels,
+                index_to_vocab, index_to_actions, index_to_targets,
+                args.num_examples
+            )
+        else:
+            val_action_losses.append(val_action_losses[-1])
+            val_target_losses.append(val_target_losses[-1])
+            val_action_accs.append(val_action_accs[-1])
+            val_target_accs.append(val_target_accs[-1])
 
     # ================== TODO: CODE HERE ================== #
     # Task: Implement some code to keep track of the model training and
@@ -283,39 +330,60 @@ def train(args, model, loaders, maps, optimizer, action_criterion, target_criter
     # 4 figures for 1) training loss, 2) training accuracy,
     # 3) validation loss, 4) validation accuracy
     # ===================================================== #
-    # plt.plot(train_action_losses)
-    # plt.plot(val_action_losses)
-    
-    # plt.plot(train_action_accs)
-    # plt.plot(val_action_accs)
 
-    with open(LOG_FILE_NAME.split('.')[0] + "-train_action_losses.log", "w") as file:
-        file.write('\n'.join(str(x) for x in train_action_losses))
-    with open(LOG_FILE_NAME.split('.')[0] + "-train_action_accs.log", "w") as file:
-        file.write('\n'.join(str(x) for x in train_action_accs))
-    with open(LOG_FILE_NAME.split('.')[0] + "-val_action_losses.log", "w") as file:
-        file.write('\n'.join(str(x) for x in val_action_losses))
-    with open(LOG_FILE_NAME.split('.')[0] + "-val_action_accs.log", "w") as file:
-        file.write('\n'.join(str(x) for x in val_action_accs))
+    store_file_prefix = "logs/" + model_filepath.split('/')[1].split('.')[0]
+
+    fig, axs = plt.subplots(2, 2, sharex=True)
+
+    axs[0,0].plot(train_action_accs, label="train")
+    axs[0,0].plot(val_action_accs, label="val")
+    axs[0,0].set_title("Action accuracy")
+    axs[0,0].set_xlabel
+    # plt.savefig(store_file_prefix + "-action_accuracies.png")
+
+    axs[0,1].plot(train_target_accs, label="train")
+    axs[0,1].plot(val_target_accs, label="val")
+    axs[0,1].set_title("Target accuracy")
+    # plt.savefig(store_file_prefix + "-target_accuracies.png")
+
+    axs[1,0].plot([l / len(loaders['train'].dataset) for l in train_action_losses], label="train")
+    axs[1,0].plot([l / len(loaders['val'].dataset) for l in val_action_losses], label="val")
+    axs[1,0].set_title("Action Loss")
+    # plt.savefig(store_file_prefix + "-action_losses.png")
+    
+    axs[1,1].plot([l / len(loaders['train'].dataset) for l in train_target_losses], label="train")
+    axs[1,1].plot([l / len(loaders['val'].dataset) for l in val_target_losses], label="val")
+    axs[1,1].set_title("Target Loss")
+    # plt.savefig(store_file_prefix + "-target_losses.png")
+
+    handles, labels = axs[1,1].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper center')
+
+    fig.savefig(store_file_prefix + "-plots.png")
+
+    torch.save(model.state_dict(), model_filepath)
 
 
 def main(args):
     device = get_device(args.force_cpu)
 
     # get dataloaders
-    train_loader, val_loader, maps = setup_dataloader(args)
+    train_loader, val_loader, maps, max_len = setup_dataloader(args)
     loaders = {"train": train_loader, "val": val_loader}
 
     # build model
-    model = setup_model(args, device, maps[0], maps[2], maps[4])
+    model = setup_model(args, device, max_len, maps[0], maps[2], maps[4])
     log.info(model)
-    model.cuda()
+    model.to(device)
 
     # get optimizer and loss functions
     action_criterion, target_criterion, optimizer = setup_optimizer(args, model)
 
     if args.eval:
-        val_action_loss, val_target_loss, val_action_acc, val_target_acc = validate(
+        model_filepath = "models/model-%s.pt" % args.eval_model_id if args.eval_model_id != -1 else last_path("models/model-%s.pt")
+        model.load_state_dict(torch.load(model_filepath))
+
+        val_action_loss, val_target_loss, val_action_acc, val_target_acc, (action_preds, target_preds, action_labels, target_labels, inputs) = validate(
             args,
             model,
             loaders["val"],
@@ -324,6 +392,23 @@ def main(args):
             target_criterion,
             device,
         )
+
+        log.info(
+            f"action loss : {val_action_loss} | target loss: {val_target_loss}"
+        )
+        log.info(
+            f"action acc : {val_action_acc} | target acc: {val_target_acc}"
+        )
+
+        log.info("Examples:")
+        log_examples(
+            inputs,
+            action_preds, action_labels,
+            target_preds, target_labels,
+            maps[1], maps[3], maps[5],
+            args.num_examples
+        )
+
     else:
         train(
             args, model, loaders, maps, optimizer, action_criterion, target_criterion, device
@@ -336,23 +421,30 @@ if __name__ == "__main__":
     parser.add_argument("--model_output_dir", type=str,               help="where to save model outputs")
     parser.add_argument("--batch_size",       type=int, default=32,   help="size of each batch in loader")
     parser.add_argument("--num_epochs",       type=int, default=1000, help="number of training epochs")
-    parser.add_argument("--val_every",                  default=5,    help="number of epochs between every eval loop")
+    parser.add_argument("--val_every",        type=int, default=5,    help="number of epochs between every eval loop")
     
     parser.add_argument("--force_cpu",        action="store_true",    help="debug mode")
     parser.add_argument("--eval",             action="store_true",    help="run eval")
+    parser.add_argument("--eval_model_id",    type=int, default=-1,   help="id of model to evaluate (default: -1, last saved model)")
+    parser.add_argument("--num_examples",     type=int, default=10,   help="number of random examples to print")
 
     # ================== TODO: CODE HERE ================== #
     # Task (optional): Add any additional command line
     # parameters you may need here
     # ===================================================== #
-    parser.add_argument("--vocab_size",    type=int,   default=10000, help="max size of vocabulary")
+    parser.add_argument("--vocab_size",    type=int,   default=1000,  help="max size of vocabulary")
     parser.add_argument("--learning_rate", type=float, default=0.001, help="learning rate (alpha)")
     parser.add_argument("--emb_dim",       type=int,   required=True, help="embedding dimension")
     parser.add_argument("--lstm_dim",      type=int,   required=True, help="lstm hidden state dimension")
+    parser.add_argument("--no_len_limit",  action="store_true",       help="don't limit length of inputs")
+    parser.add_argument("--model_type",    choices=["lstm", "attn", "act-tar", "tar-act"], default="lstm", help="specify the model architecture to use")
+    parser.add_argument("--context",       choices=["curr", "prev", "next", "prev-next"], default="curr", help="specify the context to use")
 
     args = parser.parse_args()
 
     try:
+        log.info("Args:\n\t%s", "\n\t".join(f"{k} = {v}" for k, v in vars(args).items()))
+
         main(args)
     except Exception as e:
         log.exception(e)
