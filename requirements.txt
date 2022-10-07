@@ -1,0 +1,10 @@
+matplotlib
+sklearn
+numpy
+tqdm
+scikit_learn
+gensim
+spacy
+torch
+torchmetrics
+--extra-index-url https://download.pytorch.org/whl/cu116

@@ -1,7 +1,0 @@
-matplotlib
-sklearn
-numpy
-tqdm
-torch
-torchmetrics
---extra-index-url https://download.pytorch.org/whl/cu116
