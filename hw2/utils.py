@@ -1,7 +1,24 @@
 import json
 import gensim
 import tqdm
+import torch
+import smart_open
 
+def get_device(force_cpu, status=True):
+    # if not force_cpu and torch.backends.mps.is_available():
+    # 	device = torch.device('mps')
+    # 	if status:
+    # 		print("Using MPS")
+    # elif not force_cpu and torch.cuda.is_available():
+    if not force_cpu and torch.cuda.is_available():
+        device = torch.device("cuda")
+        if status:
+            print("Using CUDA")
+    else:
+        device = torch.device("cpu")
+        if status:
+            print("Using CPU")
+    return device
 
 def read_analogies(analogies_fn):
     with open(analogies_fn, "r") as f:
@@ -11,7 +28,7 @@ def read_analogies(analogies_fn):
 
 def save_word2vec_format(fname, model, i2v):
     print("Saving word vectors to file...")  # DEBUG
-    with gensim.utils.smart_open(fname, "wb") as fout:
+    with smart_open.open(fname, "wb") as fout:
         fout.write(
             gensim.utils.to_utf8("%d %d\n" % (model.vocab_size, model.embedding_dim))
         )

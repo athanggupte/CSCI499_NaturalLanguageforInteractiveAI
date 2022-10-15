@@ -2,6 +2,7 @@ import os
 import re
 import json
 import gensim
+import smart_open
 import tqdm
 import numpy as np
 from collections import Counter
@@ -108,7 +109,7 @@ def read_analogies(analogies_fn):
 
 def save_word2vec_format(fname, model, i2v):
     print("Saving word vectors to file...")  # DEBUG
-    with gensim.utils.smart_open(fname, "wb") as fout:
+    with smart_open.open(fname, "wb") as fout:
         fout.write(
             gensim.utils.to_utf8("%d %d\n" % (model.vocab_size, model.embedding_dim))
         )
@@ -124,9 +125,10 @@ def save_word2vec_format(fname, model, i2v):
 
 
 def encode_data(data, v2i, seq_len):
-    num_insts = sum([len(ep) for ep in data])
+    # num_insts = sum([len(ep) for ep in data])
+    num_insts = len(data)
     x = np.zeros((num_insts, seq_len), dtype=np.int32)
-    lens = np.zeros((num_insts, 1), dtype=np.int32)
+    lens = np.zeros((num_insts,), dtype=np.int32)
 
     idx = 0
     n_early_cutoff = 0
@@ -146,7 +148,7 @@ def encode_data(data, v2i, seq_len):
                         n_early_cutoff += 1
                     break
         x[idx][jdx] = v2i["<end>"]
-        lens[idx][0] = jdx
+        lens[idx] = jdx + 1
         idx += 1
     print(
         "INFO: had to represent %d/%d (%.4f) tokens as unk with vocab limit %d"

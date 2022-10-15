@@ -2,6 +2,7 @@ matplotlib
 sklearn
 numpy
 tqdm
+prettytable
 scikit_learn
 gensim
 spacy

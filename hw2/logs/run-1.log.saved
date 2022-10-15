@@ -1,0 +1,268 @@
+Logger configured successfully
+Args:
+	output_dir = outputs
+	data_dir = books
+	downstream_eval = False
+	vocab_size = 3000
+	batch_size = 1024
+	force_cpu = False
+	analogies_fn = analogies_v3000_1309.json
+	word_vector_fn = learned_word_vectors.txt
+	num_epochs = 21
+	val_every = 5
+	save_every = 5
+	learning_rate = 0.01
+	model = cbow
+	embedding_dim = 300
+	context_len = 4
+	no_pad = False
+Total examples : 2916933
+Total memory : 189.16 MiB
+Total examples : 835336
+Total memory : 54.17 MiB
+CBOWModel(
+  (embed): Embedding(3000, 300)
+  (linear): Linear(in_features=300, out_features=3000, bias=True)
+)
+Epoch 0
+train loss : 4.351438774230732 | train acc: 0.23925129579596102
+val loss : 4.622508595387141 | val acc: 0.23384242987253034
+saving word vec to outputs/learned_word_vectors.txt
+Loading vectors from file 'outputs/learned_word_vectors.txt'...
+... done loading vectors
+Evaluating downstream performance on analogy task over 1309 analogies...
+WARNING: KeyError: "Key 'ministers' not present in vocabulary"
+...Total performance across all 1309 analogies: 0.0267 (Exact); 0.0471 (MRR); 21 (MR)
+...Analogy performance across 969 "sem" relation types: 0.0083 (Exact); 0.0193 (MRR); 52 (MR)
++---------------+-----+--------+--------+-----+
+|    relation   |  N  | exact  |  MRR   |  MR |
++---------------+-----+--------+--------+-----+
+|    capitals   |  1  | 0.0000 | 0.1111 |  9  |
+| binary_gender |  12 | 0.2500 | 0.2963 |  3  |
+|    antonym    |  54 | 0.0370 | 0.0656 |  15 |
+|     member    |  4  | 0.0000 | 0.0062 | 161 |
+|   hypernomy   | 542 | 0.0000 | 0.0101 |  99 |
+|    similar    | 117 | 0.0085 | 0.0153 |  65 |
+|     partof    |  29 | 0.0000 | 0.0111 |  90 |
+|   instanceof  |  9  | 0.0000 | 0.0035 | 285 |
+|  derivedfrom  | 133 | 0.0150 | 0.0256 |  39 |
+|   hascontext  |  32 | 0.0000 | 0.0072 | 138 |
+|   relatedto   |  10 | 0.0000 | 0.0033 | 302 |
+|  attributeof  |  11 | 0.0000 | 0.0011 | 879 |
+|     causes    |  6  | 0.0000 | 0.0064 | 157 |
+|    entails    |  9  | 0.0000 | 0.0126 |  79 |
++---------------+-----+--------+--------+-----+
+...Analogy performance across 340 "syn" relation types: 0.0794 (Exact); 0.1264 (MRR); 8 (MR)
++--------------------+-----+--------+--------+------+
+|      relation      |  N  | exact  |  MRR   |  MR  |
++--------------------+-----+--------+--------+------+
+|      adj_adv       |  22 | 0.0000 | 0.0041 | 244  |
+|    comparative     |  7  | 0.0000 | 0.0335 |  29  |
+|    superlative     |  3  | 0.3333 | 0.3355 |  2   |
+| present_participle |  62 | 0.0645 | 0.1121 |  8   |
+|      denonym       |  2  | 0.0000 | 0.0005 | 1952 |
+|     past_tense     |  64 | 0.1562 | 0.2148 |  4   |
+|    plural_nouns    | 107 | 0.0841 | 0.1378 |  7   |
+|    plural_verbs    |  73 | 0.0411 | 0.0849 |  11  |
++--------------------+-----+--------+--------+------+
+saving model to outputs/model.ckpt
+Epoch 1
+train loss : 4.105790698599422 | train acc: 0.2493303754320034
+Epoch 2
+train loss : 4.036595414922546 | train acc: 0.2507345900642901
+Epoch 3
+train loss : 3.9973663113836073 | train acc: 0.25136573243197563
+Epoch 4
+train loss : 3.973354633836087 | train acc: 0.2515758846706455
+Epoch 5
+train loss : 3.956972280691782 | train acc: 0.25175209715135727
+val loss : 4.866743213990155 | val acc: 0.22882289282396545
+saving word vec to outputs/learned_word_vectors.txt
+Loading vectors from file 'outputs/learned_word_vectors.txt'...
+... done loading vectors
+Evaluating downstream performance on analogy task over 1309 analogies...
+WARNING: KeyError: "Key 'ministers' not present in vocabulary"
+...Total performance across all 1309 analogies: 0.0466 (Exact); 0.0738 (MRR); 14 (MR)
+...Analogy performance across 969 "sem" relation types: 0.0134 (Exact); 0.0262 (MRR); 38 (MR)
++---------------+-----+--------+--------+-----+
+|    relation   |  N  | exact  |  MRR   |  MR |
++---------------+-----+--------+--------+-----+
+|    capitals   |  1  | 1.0000 | 1.0000 |  1  |
+| binary_gender |  12 | 0.2500 | 0.3371 |  2  |
+|    antonym    |  54 | 0.0556 | 0.0831 |  12 |
+|     member    |  4  | 0.0000 | 0.0088 | 113 |
+|   hypernomy   | 542 | 0.0055 | 0.0171 |  58 |
+|    similar    | 117 | 0.0171 | 0.0250 |  40 |
+|     partof    |  29 | 0.0000 | 0.0095 | 104 |
+|   instanceof  |  9  | 0.0000 | 0.0157 |  63 |
+|  derivedfrom  | 133 | 0.0075 | 0.0187 |  53 |
+|   hascontext  |  32 | 0.0000 | 0.0058 | 172 |
+|   relatedto   |  10 | 0.0000 | 0.0093 | 107 |
+|  attributeof  |  11 | 0.0000 | 0.0026 | 382 |
+|     causes    |  6  | 0.0000 | 0.0348 |  28 |
+|    entails    |  9  | 0.0000 | 0.0207 |  48 |
++---------------+-----+--------+--------+-----+
+...Analogy performance across 340 "syn" relation types: 0.1412 (Exact); 0.2096 (MRR); 5 (MR)
++--------------------+-----+--------+--------+-----+
+|      relation      |  N  | exact  |  MRR   |  MR |
++--------------------+-----+--------+--------+-----+
+|      adj_adv       |  22 | 0.0455 | 0.0490 |  20 |
+|    comparative     |  7  | 0.1429 | 0.3034 |  3  |
+|    superlative     |  3  | 0.3333 | 0.5476 |  1  |
+| present_participle |  62 | 0.1613 | 0.2162 |  4  |
+|      denonym       |  2  | 0.0000 | 0.0016 | 626 |
+|     past_tense     |  64 | 0.2188 | 0.3157 |  3  |
+|    plural_nouns    | 107 | 0.1121 | 0.1746 |  5  |
+|    plural_verbs    |  73 | 0.1233 | 0.1936 |  5  |
++--------------------+-----+--------+--------+-----+
+saving model to outputs/model.ckpt
+Epoch 6
+train loss : 3.945667030519249 | train acc: 0.2517438693312462
+Epoch 7
+train loss : 3.937341038826768 | train acc: 0.2518563162060973
+Epoch 8
+train loss : 3.9312118150845623 | train acc: 0.2518666009812361
+Epoch 9
+train loss : 3.926501893377923 | train acc: 0.2520945801634799
+Epoch 10
+train loss : 3.9223368755345933 | train acc: 0.25203458564183684
+val loss : 4.956233126860039 | val acc: 0.22692186138272505
+saving word vec to outputs/learned_word_vectors.txt
+Loading vectors from file 'outputs/learned_word_vectors.txt'...
+... done loading vectors
+Evaluating downstream performance on analogy task over 1309 analogies...
+WARNING: KeyError: "Key 'ministers' not present in vocabulary"
+...Total performance across all 1309 analogies: 0.0397 (Exact); 0.0677 (MRR); 15 (MR)
+...Analogy performance across 969 "sem" relation types: 0.0114 (Exact); 0.0260 (MRR); 39 (MR)
++---------------+-----+--------+--------+-----+
+|    relation   |  N  | exact  |  MRR   |  MR |
++---------------+-----+--------+--------+-----+
+|    capitals   |  1  | 1.0000 | 1.0000 |  1  |
+| binary_gender |  12 | 0.2500 | 0.3344 |  2  |
+|    antonym    |  54 | 0.0000 | 0.0465 |  21 |
+|     member    |  4  | 0.0000 | 0.0173 |  57 |
+|   hypernomy   | 542 | 0.0055 | 0.0187 |  53 |
+|    similar    | 117 | 0.0171 | 0.0277 |  36 |
+|     partof    |  29 | 0.0345 | 0.0429 |  23 |
+|   instanceof  |  9  | 0.0000 | 0.0061 | 162 |
+|  derivedfrom  | 133 | 0.0075 | 0.0170 |  58 |
+|   hascontext  |  32 | 0.0000 | 0.0026 | 377 |
+|   relatedto   |  10 | 0.0000 | 0.0086 | 116 |
+|  attributeof  |  11 | 0.0000 | 0.0059 | 169 |
+|     causes    |  6  | 0.0000 | 0.0587 |  17 |
+|    entails    |  9  | 0.0000 | 0.0091 | 109 |
++---------------+-----+--------+--------+-----+
+...Analogy performance across 340 "syn" relation types: 0.1206 (Exact); 0.1866 (MRR); 5 (MR)
++--------------------+-----+--------+--------+-----+
+|      relation      |  N  | exact  |  MRR   |  MR |
++--------------------+-----+--------+--------+-----+
+|      adj_adv       |  22 | 0.0000 | 0.0261 |  38 |
+|    comparative     |  7  | 0.2857 | 0.3908 |  2  |
+|    superlative     |  3  | 0.3333 | 0.3833 |  2  |
+| present_participle |  62 | 0.0968 | 0.1647 |  6  |
+|      denonym       |  2  | 0.0000 | 0.0017 | 602 |
+|     past_tense     |  64 | 0.2031 | 0.2952 |  3  |
+|    plural_nouns    | 107 | 0.1028 | 0.1556 |  6  |
+|    plural_verbs    |  73 | 0.1096 | 0.1812 |  5  |
++--------------------+-----+--------+--------+-----+
+saving model to outputs/model.ckpt
+Epoch 11
+train loss : 3.9191707462626786 | train acc: 0.25216383098274797
+Epoch 12
+train loss : 3.916828119533026 | train acc: 0.2522413096221271
+Epoch 13
+train loss : 3.914275581353838 | train acc: 0.2521254344888964
+Epoch 14
+train loss : 3.912699846687464 | train acc: 0.25235889888454754
+Epoch 15
+train loss : 3.9108765289297267 | train acc: 0.2524353490464128
+val loss : 4.991125637409734 | val acc: 0.22685123112136912
+saving word vec to outputs/learned_word_vectors.txt
+Loading vectors from file 'outputs/learned_word_vectors.txt'...
+... done loading vectors
+Evaluating downstream performance on analogy task over 1309 analogies...
+WARNING: KeyError: "Key 'ministers' not present in vocabulary"
+...Total performance across all 1309 analogies: 0.0359 (Exact); 0.0645 (MRR); 15 (MR)
+...Analogy performance across 969 "sem" relation types: 0.0052 (Exact); 0.0222 (MRR); 45 (MR)
++---------------+-----+--------+--------+-----+
+|    relation   |  N  | exact  |  MRR   |  MR |
++---------------+-----+--------+--------+-----+
+|    capitals   |  1  | 1.0000 | 1.0000 |  1  |
+| binary_gender |  12 | 0.1667 | 0.2750 |  3  |
+|    antonym    |  54 | 0.0000 | 0.0472 |  21 |
+|     member    |  4  | 0.0000 | 0.0157 |  63 |
+|   hypernomy   | 542 | 0.0018 | 0.0162 |  61 |
+|    similar    | 117 | 0.0000 | 0.0184 |  54 |
+|     partof    |  29 | 0.0000 | 0.0234 |  42 |
+|   instanceof  |  9  | 0.0000 | 0.0117 |  85 |
+|  derivedfrom  | 133 | 0.0000 | 0.0108 |  92 |
+|   hascontext  |  32 | 0.0000 | 0.0035 | 285 |
+|   relatedto   |  10 | 0.0000 | 0.0140 |  71 |
+|  attributeof  |  11 | 0.0000 | 0.0070 | 142 |
+|     causes    |  6  | 0.1667 | 0.1691 |  5  |
+|    entails    |  9  | 0.0000 | 0.0092 | 108 |
++---------------+-----+--------+--------+-----+
+...Analogy performance across 340 "syn" relation types: 0.1235 (Exact); 0.1852 (MRR); 5 (MR)
++--------------------+-----+--------+--------+-----+
+|      relation      |  N  | exact  |  MRR   |  MR |
++--------------------+-----+--------+--------+-----+
+|      adj_adv       |  22 | 0.0000 | 0.0060 | 165 |
+|    comparative     |  7  | 0.2857 | 0.3528 |  2  |
+|    superlative     |  3  | 0.3333 | 0.3942 |  2  |
+| present_participle |  62 | 0.0806 | 0.1515 |  6  |
+|      denonym       |  2  | 0.0000 | 0.0062 | 161 |
+|     past_tense     |  64 | 0.2188 | 0.2916 |  3  |
+|    plural_nouns    | 107 | 0.1121 | 0.1628 |  6  |
+|    plural_verbs    |  73 | 0.1096 | 0.1879 |  5  |
++--------------------+-----+--------+--------+-----+
+saving model to outputs/model.ckpt
+Epoch 16
+train loss : 3.9093330211913893 | train acc: 0.25243157796219523
+Epoch 17
+train loss : 3.9083152265036554 | train acc: 0.25222999636947435
+Epoch 18
+train loss : 3.907262421022511 | train acc: 0.25236952648552435
+Epoch 19
+train loss : 3.905802621218814 | train acc: 0.25247511684361623
+Epoch 20
+train loss : 3.905109471042937 | train acc: 0.2525443676628843
+val loss : 5.0192622407978655 | val acc: 0.2275946445502169
+saving word vec to outputs/learned_word_vectors.txt
+Loading vectors from file 'outputs/learned_word_vectors.txt'...
+... done loading vectors
+Evaluating downstream performance on analogy task over 1309 analogies...
+WARNING: KeyError: "Key 'ministers' not present in vocabulary"
+...Total performance across all 1309 analogies: 0.0420 (Exact); 0.0675 (MRR); 15 (MR)
+...Analogy performance across 969 "sem" relation types: 0.0124 (Exact); 0.0261 (MRR); 38 (MR)
++---------------+-----+--------+--------+-----+
+|    relation   |  N  | exact  |  MRR   |  MR |
++---------------+-----+--------+--------+-----+
+|    capitals   |  1  | 1.0000 | 1.0000 |  1  |
+| binary_gender |  12 | 0.2500 | 0.3412 |  2  |
+|    antonym    |  54 | 0.0556 | 0.0823 |  12 |
+|     member    |  4  | 0.0000 | 0.0259 |  38 |
+|   hypernomy   | 542 | 0.0074 | 0.0188 |  53 |
+|    similar    | 117 | 0.0000 | 0.0174 |  57 |
+|     partof    |  29 | 0.0000 | 0.0164 |  60 |
+|   instanceof  |  9  | 0.0000 | 0.0248 |  40 |
+|  derivedfrom  | 133 | 0.0000 | 0.0096 | 103 |
+|   hascontext  |  32 | 0.0000 | 0.0019 | 514 |
+|   relatedto   |  10 | 0.0000 | 0.0275 |  36 |
+|  attributeof  |  11 | 0.0000 | 0.0084 | 118 |
+|     causes    |  6  | 0.1667 | 0.1699 |  5  |
+|    entails    |  9  | 0.0000 | 0.0058 | 171 |
++---------------+-----+--------+--------+-----+
+...Analogy performance across 340 "syn" relation types: 0.1265 (Exact); 0.1855 (MRR); 5 (MR)
++--------------------+-----+--------+--------+-----+
+|      relation      |  N  | exact  |  MRR   |  MR |
++--------------------+-----+--------+--------+-----+
+|      adj_adv       |  22 | 0.0000 | 0.0047 | 212 |
+|    comparative     |  7  | 0.2857 | 0.3673 |  2  |
+|    superlative     |  3  | 0.3333 | 0.3858 |  2  |
+| present_participle |  62 | 0.0806 | 0.1420 |  7  |
+|      denonym       |  2  | 0.0000 | 0.0036 | 280 |
+|     past_tense     |  64 | 0.2188 | 0.2877 |  3  |
+|    plural_nouns    | 107 | 0.1028 | 0.1618 |  6  |
+|    plural_verbs    |  73 | 0.1370 | 0.2015 |  4  |
++--------------------+-----+--------+--------+-----+
+saving model to outputs/model.ckpt

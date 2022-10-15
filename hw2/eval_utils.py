@@ -1,15 +1,18 @@
 import gensim
 import tqdm
+from log import get_logger
+from prettytable import PrettyTable
 
+log = get_logger()
 
 def downstream_validation(word_vectors_fn, external_val_analogies):
-    print("Loading vectors from file '%s'..." % word_vectors_fn)
+    log.info("Loading vectors from file '%s'..." % word_vectors_fn)
     wv = gensim.models.KeyedVectors.load_word2vec_format(
         word_vectors_fn, binary=word_vectors_fn[-4:] == ".bin"
     )
-    print("... done loading vectors")
+    log.info("... done loading vectors")
 
-    print(
+    log.info(
         "Evaluating downstream performance on analogy task over %d analogies..."
         % len(external_val_analogies)
     )
@@ -38,7 +41,7 @@ def downstream_validation(word_vectors_fn, external_val_analogies):
             topn_words = [r[0] for r in result]
         except KeyError as err:  # word not in vocabulary; only possible when loading external word vectors
             topn_words = [None]
-            print("WARNING: KeyError: {0}".format(err))
+            log.info("WARNING: KeyError: {0}".format(err))
         if d in topn_words:
             t_correct[t] += 1 / (topn_words.index(d) + 1)  # reciprocol rank score
             r_correct[(t, r)] += 1 / (topn_words.index(d) + 1)  # reciprocol rank score
@@ -50,7 +53,7 @@ def downstream_validation(word_vectors_fn, external_val_analogies):
         t_tested[t] += 1
         r_tested[(t, r)] += 1
         all_tested += 1
-    print(
+    log.info(
         "...Total performance across all %d analogies: %.4f (Exact); %.4f (MRR); %.0f (MR)"
         % (
             all_tested,
@@ -60,7 +63,7 @@ def downstream_validation(word_vectors_fn, external_val_analogies):
         )
     )
     for t in t_tested:
-        print(
+        log.info(
             '...Analogy performance across %d "%s" relation types: %.4f (Exact); %.4f (MRR); %.0f (MR)'
             % (
                 t_tested[t],
@@ -70,18 +73,29 @@ def downstream_validation(word_vectors_fn, external_val_analogies):
                 t_tested[t] / t_correct[t] if t_correct[t] > 0 else float("inf"),
             )
         )
-        print("\trelation\tN\texact\tMRR\tMR")
+        tab = PrettyTable(["relation", "N", "exact", "MRR", "MR"], float_format=".4")
+        # log.info("\trelation\tN\texact\tMRR\tMR")
         for (_t, r) in r_tested:
             if _t == t:
-                print(
-                    "\t%s\t%d\t%.4f\t%.4f\t%.0f"
-                    % (
-                        r,
-                        r_tested[(t, r)],
-                        r_exact[(t, r)] / r_tested[(t, r)],
-                        r_correct[(t, r)] / r_tested[(t, r)],
-                        r_tested[(t, r)] / r_correct[(t, r)]
-                        if r_correct[(t, r)] > 0
-                        else float("inf"),
-                    )
-                )
+                tab.add_row([
+                    r,
+                    r_tested[(t, r)],
+                    r_exact[(t, r)] / r_tested[(t, r)],
+                    r_correct[(t, r)] / r_tested[(t, r)],
+                    int(r_tested[(t, r)] / r_correct[(t, r)])
+                    if r_correct[(t, r)] > 0
+                    else float("inf"),
+                ])
+                # log.info(
+                #     "\t%s\t%d\t%.4f\t%.4f\t%.0f"
+                #     % (
+                #         r,
+                #         r_tested[(t, r)],
+                #         r_exact[(t, r)] / r_tested[(t, r)],
+                #         r_correct[(t, r)] / r_tested[(t, r)],
+                #         r_tested[(t, r)] / r_correct[(t, r)]
+                #         if r_correct[(t, r)] > 0
+                #         else float("inf"),
+                #     )
+                # )
+        log.info(tab)
