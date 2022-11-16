@@ -3,6 +3,7 @@ import torch
 import argparse
 from sklearn.metrics import accuracy_score
 from log import setup_logging, get_logger
+from random import random
 
 from utils import (
     get_device,
@@ -41,12 +42,13 @@ def setup_dataloader(args):
     # Hint: use the helper functions provided in utils.py
     # ===================================================== #
     train_eps, val_eps = extract_episodes_from_json(args.in_data_fn)
-    train_eps = train_eps[:1000]
     train_data = flatten_episodes(train_eps)
     val_data = flatten_episodes(val_eps)
 
-    vocab_to_index, index_to_vocab, _ = build_tokenizer_table(train_eps, vocab_size=args.vocab_size)
-    actions_to_index, index_to_actions, targets_to_index, index_to_targets = build_output_tables(train_eps)
+    vocab_to_index, index_to_vocab, max_inseq_len = build_tokenizer_table(train_eps, vocab_size=args.vocab_size)
+    actions_to_index, index_to_actions, targets_to_index, index_to_targets, max_outseq_len = build_output_tables(train_eps)
+
+    #train_data = train_data[:5000]
 
     train_np_x, train_np_y = encode_data(train_data, vocab_to_index, actions_to_index, targets_to_index)
     val_np_x, val_np_y = encode_data(val_data, vocab_to_index, actions_to_index, targets_to_index)
@@ -56,7 +58,7 @@ def setup_dataloader(args):
 
     train_loader = get_dataloader(train_dataset, args.batch_size)
     val_loader = get_dataloader(val_dataset, args.batch_size)
-    return train_loader, val_loader, (vocab_to_index, index_to_vocab, actions_to_index, index_to_actions, targets_to_index, index_to_targets)
+    return train_loader, val_loader, (vocab_to_index, index_to_vocab, actions_to_index, index_to_actions, targets_to_index, index_to_targets), max_inseq_len, max_outseq_len
 
 
 def setup_model(args, device, maps):
@@ -97,7 +99,7 @@ def setup_optimizer(args, model):
     # Task: Initialize the loss function for action predictions
     # and target predictions. Also initialize your optimizer.
     # ===================================================== #
-    criterion = (torch.nn.CrossEntropyLoss(), torch.nn.CrossEntropyLoss())
+    criterion = (torch.nn.CrossEntropyLoss(ignore_index=0), torch.nn.CrossEntropyLoss(ignore_index=0))
     optimizer = torch.optim.SGD(model.parameters(), args.learning_rate, momentum=0.1)
     return criterion, optimizer
 
@@ -131,34 +133,46 @@ def train_epoch(
     epoch_acc = 0.0
 
     done = 0
+    first = True
 
     # iterate over each batch in the dataloader
     # NOTE: you may have additional outputs from the loader __getitem__, you can modify this
     for (inputs, x_lens, labels, y_lens) in loader:
-        print("next minibatch : ", done)
+        # print("next minibatch : ", done)
         # put model inputs to device
         inputs, labels = inputs.to(device), labels.to(device)
 
+        use_teacher_forcing = training and random() < 0.5
+
         # calculate the loss and train accuracy and perform backprop
         # NOTE: feel free to change the parameters to the model forward pass here + outputs
-        out_actions, out_targets = model(inputs, x_lens, labels, y_lens)
+        if use_teacher_forcing:
+                out_actions, out_targets = model(inputs, x_lens, labels, y_lens)
+        else:
+            out_actions, out_targets = model(inputs, x_lens)
+            # out_actions, out_targets = model(inputs, x_lens, labels, y_lens)
 
         loss = 0.0
-        if not args.student_forcing:
-            print("labels size : ", labels.size())
-            for oidx in range(labels.size(1)):
-                loss += criterion[0](out_actions[:,oidx,:], labels[:,oidx,0].long())
-                loss += criterion[1](out_targets[:,oidx,:], labels[:,oidx,1].long())
+        if use_teacher_forcing:
+            # print("labels size : ", labels.size())
+            # for oidx in range(labels.size(1)):
+            #     loss += criterion[0](out_actions[:,oidx,:], labels[:,oidx,0].long())
+            #     loss += criterion[1](out_targets[:,oidx,:], labels[:,oidx,1].long())
+            loss += criterion[0](out_actions.transpose(1,2), labels[:,:,0].long())
+            loss += criterion[1](out_targets.transpose(1,2), labels[:,:,1].long())
+        else:
+            loss += criterion[0](out_actions[:,:labels.size(1)].transpose(1,2), labels[:,:,0].long())
+            loss += criterion[1](out_targets[:,:labels.size(1)].transpose(1,2), labels[:,:,1].long())
 
-        print("loss : %s" % loss.item())
+        # print("loss : %s" % loss.item())
         # step optimizer and compute gradients during training
         if training:
             optimizer.zero_grad()
             loss.backward()
-            print("completed backward")
+            # print("completed backward")
             optimizer.step()
             done += len(inputs)
-            print("completed optimizer step : %s" % done)
+            # print("completed optimizer step : %s" % done)
 
         """
         # TODO: implement code to compute some other metrics between your predicted sequence
@@ -168,13 +182,27 @@ def train_epoch(
         """
         if not training:
             # TODO: add code to log these metrics
-            output = torch.cat((torch.argmax(out_actions, dim=2, keepdim=True), torch.argmax(out_actions, dim=2, keepdim=True)), dim=2)
-            em = output == labels
-            prefix_em = prefix_match(output, labels)
+            action_preds = torch.argmax(out_actions[:,:labels.size(1)], dim=2, keepdim=True)
+            target_preds = torch.argmax(out_targets[:,:labels.size(1)], dim=2, keepdim=True)
+            output = torch.cat((action_preds, target_preds), dim=2)
+            # mask = (labels > 0).int()
+            em = (output == labels).int()
+            if first:
+                print(" preds : ", output[0])
+                print("labels : ", labels[0])
+                print("    em : ", em[0])
+                first = False
+            # log.debug("em : %s", em.size())
+            # prefix_em = prefix_match(output, labels)
+
+            exact = 0.0
             acc = 0.0
+            for idx in range(len(output)):
+                # exact = torch.
+                acc += torch.mean(em[idx,:y_lens[idx]], dtype=torch.float)
 
             # logging
-            epoch_acc += acc.item()
+            epoch_acc += acc.item() / len(output)
 
         epoch_loss += loss.item()
 
@@ -201,6 +229,8 @@ def validate(args, model, loader, optimizer, criterion, device):
             training=False,
         )
 
+    model.train()
+
     return val_loss, val_acc
 
 
@@ -210,8 +240,10 @@ def train(args, model, loaders, optimizer, criterion, device):
     # weights via backpropagation
     model.train()
 
-    for epoch in tqdm.tqdm(range(args.num_epochs)):
+    train_losses = []
+    val_losses, val_accs = [], []
 
+    for epoch in tqdm.tqdm(range(args.num_epochs)):
         # train single epoch
         # returns loss for action and target prediction and accuracy
         train_loss, train_acc = train_epoch(
@@ -225,6 +257,7 @@ def train(args, model, loaders, optimizer, criterion, device):
 
         # some logging
         log.info(f"train loss : {train_loss}")
+        train_losses.append(train_loss)
 
         # run validation every so often
         # during eval, we run a forward pass through the model and compute
@@ -241,6 +274,9 @@ def train(args, model, loaders, optimizer, criterion, device):
 
             log.info(f"val loss : {val_loss} | val acc: {val_acc}")
 
+            val_losses.append(val_loss)
+            val_accs.append(val_acc)
+
     # ================== TODO: CODE HERE ================== #
     # Task: Implement some code to keep track of the model training and
     # evaluation loss. Use the matplotlib library to plot
@@ -252,7 +288,7 @@ def main(args):
     device = get_device(args.force_cpu)
 
     # get dataloaders
-    train_loader, val_loader, maps = setup_dataloader(args)
+    train_loader, val_loader, maps, max_inseq_len, max_outseq_len = setup_dataloader(args)
     loaders = {"train": train_loader, "val": val_loader}
 
     # build model

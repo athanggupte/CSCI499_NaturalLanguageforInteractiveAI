@@ -60,15 +60,19 @@ def build_tokenizer_table(train, vocab_size=1000):
     return (
         vocab_to_index,
         index_to_vocab,
-        int(np.average(padded_lens) + np.std(padded_lens) * 2 + 0.5),
+        # int(np.average(padded_lens) + np.std(padded_lens) * 2 + 0.5),
+        int(np.max(padded_lens)),
     )
 
 
 def build_output_tables(train):
     actions = set()
     targets = set()
+    max_len = 0
+
     for episode in train:
         for _, outseq in episode:
+            max_len = max(max_len, len(outseq) + 2)
             a, t = outseq
             actions.add(a)
             targets.add(t)
@@ -79,7 +83,7 @@ def build_output_tables(train):
     actions_to_index['<stop>'], targets_to_index['<stop>'] = 2, 2
     index_to_actions = {actions_to_index[a]: a for a in actions_to_index}
     index_to_targets = {targets_to_index[t]: t for t in targets_to_index}
-    return actions_to_index, index_to_actions, targets_to_index, index_to_targets
+    return actions_to_index, index_to_actions, targets_to_index, index_to_targets, max_len
 
 def prefix_match(predicted_labels, gt_labels):
     # predicted and gt are sequences of (action, target) labels, the sequences should be of same length
