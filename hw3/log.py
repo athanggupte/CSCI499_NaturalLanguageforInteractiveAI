@@ -53,11 +53,11 @@ def setup_logging():
     streamHandler.setFormatter(formatter)
     fileHandler = RotatingFileHandler(filename=filepath, maxBytes=2*1024*1024, backupCount=5)
     fileHandler.setFormatter(formatter)
-    fileHandler.setLevel(logging.INFO)
+    # fileHandler.setLevel(logging.INFO)
 
     log.addHandler(streamHandler)
-    log.setLevel(logging.DEBUG)
     log.addHandler(fileHandler)
+    log.setLevel(logging.DEBUG)
 
     log.info("Logger configured successfully")
 

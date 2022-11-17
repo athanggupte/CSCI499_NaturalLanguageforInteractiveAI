@@ -4,6 +4,7 @@ import argparse
 from sklearn.metrics import accuracy_score
 from log import setup_logging, get_logger
 from random import random
+import matplotlib.pyplot as plt
 
 from utils import (
     get_device,
@@ -18,7 +19,7 @@ from utils import (
     prefix_match
 )
 
-from model import Encoder, Decoder, EncoderDecoder
+from model import Encoder, Decoder, EncoderDecoder, EncoderDecoderAttention
 
 # Get logger
 setup_logging()
@@ -83,9 +84,17 @@ def setup_model(args, device, maps):
     # of feeding the model prediction into the recurrent model,
     # you will give the embedding of the target token.
     # ===================================================== #
-    enc = Encoder(device, args.emb_dim, args.hidden_dim, maps[0])
-    dec = Decoder(device, args.emb_dim, args.hidden_dim, maps[2], maps[4])
-    model = EncoderDecoder(device, enc, dec, args.hidden_dim, maps[2], maps[4])
+
+    if args.model_type == 'lstm':
+        enc = Encoder(device, args.emb_dim, args.hidden_dim, maps[0])
+        dec = Decoder(device, args.emb_dim, args.hidden_dim, maps[2], maps[4])
+        model = EncoderDecoder(device, enc, dec, args.hidden_dim, maps[2], maps[4])
+    elif args.model_type == 'attn':
+        enc = Encoder(device, args.emb_dim, args.hidden_dim, maps[0])
+        dec = Decoder(device, args.emb_dim, args.hidden_dim, maps[2], maps[4])
+        model = EncoderDecoderAttention(device, enc, dec, args.hidden_dim, maps[2], maps[4])
+    elif args.model_type == 'trfm':
+        return None
     return model
 
 
@@ -130,6 +139,8 @@ def train_epoch(
     """
 
     epoch_loss = 0.0
+    epoch_acc_em = 0.0
+    epoch_acc_pw = 0.0
     epoch_acc = 0.0
 
     done = 0
@@ -138,7 +149,7 @@ def train_epoch(
     # iterate over each batch in the dataloader
     # NOTE: you may have additional outputs from the loader __getitem__, you can modify this
     for (inputs, x_lens, labels, y_lens) in loader:
-        # print("next minibatch : ", done)
+        #print("next minibatch : ", done)
         # put model inputs to device
         inputs, labels = inputs.to(device), labels.to(device)
 
@@ -164,15 +175,15 @@ def train_epoch(
             loss += criterion[0](out_actions[:,:labels.size(1)].transpose(1,2), labels[:,:,0].long())
             loss += criterion[1](out_targets[:,:labels.size(1)].transpose(1,2), labels[:,:,1].long())
 
-        # print("loss : %s" % loss.item())
+        #print("loss : %s" % loss.item())
         # step optimizer and compute gradients during training
         if training:
             optimizer.zero_grad()
             loss.backward()
-            # print("completed backward")
+            #print("completed backward")
             optimizer.step()
             done += len(inputs)
-            # print("completed optimizer step : %s" % done)
+            #print("completed optimizer step : %s" % done)
 
         """
         # TODO: implement code to compute some other metrics between your predicted sequence
@@ -186,31 +197,39 @@ def train_epoch(
             target_preds = torch.argmax(out_targets[:,:labels.size(1)], dim=2, keepdim=True)
             output = torch.cat((action_preds, target_preds), dim=2)
             # mask = (labels > 0).int()
-            em = (output == labels).int()
+            em = (output[:,:,:] == labels[:,:,:]).int()
+            pairwise_match = torch.all(em, dim=2).int()
             if first:
-                print(" preds : ", output[0])
-                print("labels : ", labels[0])
-                print("    em : ", em[0])
+                log.debug(" preds : %s", output[0,:y_lens[0]])
+                log.debug("labels : %s", labels[0,:y_lens[0]])
+                log.debug("    em : %s", em[0,:y_lens[0]])
+                log.debug(" pairs : %s", pairwise_match[0,:y_lens[0]])
                 first = False
             # log.debug("em : %s", em.size())
             # prefix_em = prefix_match(output, labels)
 
             exact = 0.0
-            acc = 0.0
+            acc_pairwise = 0.0
+            acc_token = 0.0
             for idx in range(len(output)):
-                # exact = torch.
-                acc += torch.mean(em[idx,:y_lens[idx]], dtype=torch.float)
+                exact += torch.all(em[idx,1:y_lens[idx]]).float()
+                acc_pairwise += torch.mean(pairwise_match[idx,1:y_lens[idx]], dtype=torch.float)
+                acc_token += torch.mean(em[idx,1:y_lens[idx]], dtype=torch.float)
 
             # logging
-            epoch_acc += acc.item() / len(output)
+            epoch_acc_em += exact.item() / len(output)
+            epoch_acc_pw += acc_pairwise.item() / len(output)
+            epoch_acc += acc_token.item() / len(output)
 
         epoch_loss += loss.item()
 
     log.debug("calculating epoch loss...")
     epoch_loss /= len(loader)
+    epoch_acc_em /= len(loader)
+    epoch_acc_pw /= len(loader)
     epoch_acc /= len(loader)
 
-    return epoch_loss, epoch_acc
+    return epoch_loss, (epoch_acc_em, epoch_acc_pw, epoch_acc)
 
 
 def validate(args, model, loader, optimizer, criterion, device):
@@ -272,7 +291,7 @@ def train(args, model, loaders, optimizer, criterion, device):
                 device,
             )
 
-            log.info(f"val loss : {val_loss} | val acc: {val_acc}")
+            log.info(f"val loss : {val_loss} | val acc: (exact: {val_acc[0]} | pairwise: {val_acc[1]} | tokens: {val_acc[2]})")
 
             val_losses.append(val_loss)
             val_accs.append(val_acc)
@@ -282,6 +301,28 @@ def train(args, model, loaders, optimizer, criterion, device):
     # evaluation loss. Use the matplotlib library to plot
     # 3 figures for 1) training loss, 2) validation loss, 3) validation accuracy
     # ===================================================== #
+    val_x_axis = [5 * i for i in range(len(val_losses))]
+
+    fig, axs = plt.subplots(1,1, sharex=True)
+
+    axs.plot(train_losses, label='train')
+    axs.plot(val_x_axis, val_losses, label='val')
+    axs.set_title('Loss')
+
+    handles, labels = axs.get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper right')
+    fig.savefig(args.model_output_dir + '/plots-' + args.model_type + '-loss.png')
+
+    fig, axs = plt.subplots(1,1, sharex=True)
+
+    axs.plot(val_x_axis, [em for em,_,_ in val_accs], label='exact match')
+    axs.plot(val_x_axis, [pw for _,pw,_ in val_accs], label='pairwise match')
+    axs.plot(val_x_axis, [tk for _,_,tk in val_accs], label='token match')
+    axs.set_title('Accuracy')
+
+    handles, labels = axs.get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper left')
+    fig.savefig(args.model_output_dir + '/plots-' + args.model_type + '-acc.png')
 
 
 def main(args):
@@ -337,7 +378,14 @@ if __name__ == "__main__":
     parser.add_argument("--hidden_dim", default=100, help="hidden dimension for LSTMs")
     parser.add_argument("--learning_rate", default=0.1, help="learning rate")
     parser.add_argument("--student_forcing", action="store_true", help="use student forcing during training")
+    parser.add_argument("--model_type", choices=['lstm', 'attn', 'trfm'], default='lstm', help="type of model to use - lstm (lstm enc-dec) | attn (lstm enc-dec + attention) | trfm (transformer enc - lstm dec)")
 
     args = parser.parse_args()
 
-    main(args)
+    try:
+        log.info("Args:\n\t%s", "\n\t".join(f"{k} = {v}" for k, v in vars(args).items()))
+
+        main(args)
+    except Exception as e:
+        log.exception(e)
+        log.handlers[1].flush()
