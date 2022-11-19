@@ -19,7 +19,7 @@ from utils import (
     prefix_match
 )
 
-from model import Encoder, Decoder, EncoderDecoder, EncoderDecoderAttention
+from model import Encoder, Decoder, EncoderDecoder, EncoderDecoderAttention, EncoderTransformer, EncoderDecoderTransformerAttention
 
 # Get logger
 setup_logging()
@@ -49,6 +49,7 @@ def setup_dataloader(args):
     vocab_to_index, index_to_vocab, max_inseq_len = build_tokenizer_table(train_eps, vocab_size=args.vocab_size)
     actions_to_index, index_to_actions, targets_to_index, index_to_targets, max_outseq_len = build_output_tables(train_eps)
 
+    log.debug("max input sequence length : %d | max output sequence length : %d", max_inseq_len, max_outseq_len)
     #train_data = train_data[:5000]
 
     train_np_x, train_np_y = encode_data(train_data, vocab_to_index, actions_to_index, targets_to_index)
@@ -59,7 +60,7 @@ def setup_dataloader(args):
 
     train_loader = get_dataloader(train_dataset, args.batch_size)
     val_loader = get_dataloader(val_dataset, args.batch_size)
-    return train_loader, val_loader, (vocab_to_index, index_to_vocab, actions_to_index, index_to_actions, targets_to_index, index_to_targets), max_inseq_len, max_outseq_len
+    return train_loader, val_loader, (vocab_to_index, index_to_vocab, actions_to_index, index_to_actions, targets_to_index, index_to_targets, max_inseq_len, max_outseq_len)
 
 
 def setup_model(args, device, maps):
@@ -88,13 +89,16 @@ def setup_model(args, device, maps):
     if args.model_type == 'lstm':
         enc = Encoder(device, args.emb_dim, args.hidden_dim, maps[0])
         dec = Decoder(device, args.emb_dim, args.hidden_dim, maps[2], maps[4])
-        model = EncoderDecoder(device, enc, dec, args.hidden_dim, maps[2], maps[4])
+        model = EncoderDecoder(device, enc, dec, args.hidden_dim, maps[2], maps[4], max_out_len=maps[7])
     elif args.model_type == 'attn':
         enc = Encoder(device, args.emb_dim, args.hidden_dim, maps[0])
         dec = Decoder(device, args.emb_dim, args.hidden_dim, maps[2], maps[4])
-        model = EncoderDecoderAttention(device, enc, dec, args.hidden_dim, maps[2], maps[4])
+        model = EncoderDecoderAttention(device, enc, dec, args.hidden_dim, maps[2], maps[4], max_out_len=maps[7], num_attn_heads=args.num_attn_heads, attn_stride=args.attn_stride, attn_window=args.attn_window)
     elif args.model_type == 'trfm':
-        return None
+        enc = EncoderTransformer(device, args.emb_dim, args.hidden_dim, args.num_attn_heads, args.num_trfm_layers, maps[0], max_len=maps[6])
+        dec = Decoder(device, args.emb_dim, args.hidden_dim, maps[2], maps[4])
+        model = EncoderDecoderTransformerAttention(device, enc, dec, args.hidden_dim, maps[2], maps[4], max_out_len=maps[7]+1)
+        # model = EncoderDecoderAttention(device, enc, dec, args.hidden_dim, maps[2], maps[4])
     return model
 
 
@@ -121,6 +125,7 @@ def train_epoch(
     criterion,
     device,
     training=True,
+    calc_accuracy=False
 ):
     """
     # TODO: implement function for greedy decoding.
@@ -140,6 +145,7 @@ def train_epoch(
 
     epoch_loss = 0.0
     epoch_acc_em = 0.0
+    epoch_acc_pm = 0.0
     epoch_acc_pw = 0.0
     epoch_acc = 0.0
 
@@ -158,7 +164,7 @@ def train_epoch(
         # calculate the loss and train accuracy and perform backprop
         # NOTE: feel free to change the parameters to the model forward pass here + outputs
         if use_teacher_forcing:
-                out_actions, out_targets = model(inputs, x_lens, labels, y_lens)
+            out_actions, out_targets = model(inputs, x_lens, labels[:,:-1], torch.tensor(y_lens, dtype=torch.long) - 1)
         else:
             out_actions, out_targets = model(inputs, x_lens)
             # out_actions, out_targets = model(inputs, x_lens, labels, y_lens)
@@ -169,11 +175,11 @@ def train_epoch(
             # for oidx in range(labels.size(1)):
             #     loss += criterion[0](out_actions[:,oidx,:], labels[:,oidx,0].long())
             #     loss += criterion[1](out_targets[:,oidx,:], labels[:,oidx,1].long())
-            loss += criterion[0](out_actions.transpose(1,2), labels[:,:,0].long())
-            loss += criterion[1](out_targets.transpose(1,2), labels[:,:,1].long())
+            loss += criterion[0](out_actions.transpose(1,2), labels[:,1:,0].long())
+            loss += criterion[1](out_targets.transpose(1,2), labels[:,1:,1].long())
         else:
-            loss += criterion[0](out_actions[:,:labels.size(1)].transpose(1,2), labels[:,:,0].long())
-            loss += criterion[1](out_targets[:,:labels.size(1)].transpose(1,2), labels[:,:,1].long())
+            loss += criterion[0](out_actions[:,:labels.size(1)-1].transpose(1,2), labels[:,1:,0].long())
+            loss += criterion[1](out_targets[:,:labels.size(1)-1].transpose(1,2), labels[:,1:,1].long())
 
         #print("loss : %s" % loss.item())
         # step optimizer and compute gradients during training
@@ -191,10 +197,16 @@ def train_epoch(
         # exact match and prefix exact match. You can also try to compute longest common subsequence.
         # Feel free to change the input to these functions.
         """
-        if not training:
+        if not training: # or calc_accuracy:
+            # if first:
+            #     log.info("Evaluating on %s set...", 'train' if training else 'val')
+
             # TODO: add code to log these metrics
-            action_preds = torch.argmax(out_actions[:,:labels.size(1)], dim=2, keepdim=True)
-            target_preds = torch.argmax(out_targets[:,:labels.size(1)], dim=2, keepdim=True)
+            action_preds = torch.argmax(out_actions[:,:labels.size(1)-1], dim=2, keepdim=True)
+            target_preds = torch.argmax(out_targets[:,:labels.size(1)-1], dim=2, keepdim=True)
+            
+            action_preds = torch.cat((torch.ones((action_preds.size(0), 1, 1), dtype=torch.int32, device=device), action_preds), dim=1)
+            target_preds = torch.cat((torch.ones((target_preds.size(0), 1, 1), dtype=torch.int32, device=device), target_preds), dim=1)
             output = torch.cat((action_preds, target_preds), dim=2)
             # mask = (labels > 0).int()
             em = (output[:,:,:] == labels[:,:,:]).int()
@@ -208,16 +220,19 @@ def train_epoch(
             # log.debug("em : %s", em.size())
             # prefix_em = prefix_match(output, labels)
 
-            exact = 0.0
+            acc_exact = 0.0
+            acc_prefix = 0.0
             acc_pairwise = 0.0
             acc_token = 0.0
             for idx in range(len(output)):
-                exact += torch.all(em[idx,1:y_lens[idx]]).float()
-                acc_pairwise += torch.mean(pairwise_match[idx,1:y_lens[idx]], dtype=torch.float)
-                acc_token += torch.mean(em[idx,1:y_lens[idx]], dtype=torch.float)
+                acc_exact += torch.all(em[idx,:y_lens[idx]]).float()
+                acc_pairwise += torch.mean(pairwise_match[idx,:y_lens[idx]], dtype=torch.float)
+                acc_token += torch.mean(em[idx,:y_lens[idx]], dtype=torch.float)
+                acc_prefix += prefix_match(output[idx,:y_lens[idx]], labels[idx,:y_lens[idx]])
 
             # logging
-            epoch_acc_em += exact.item() / len(output)
+            epoch_acc_em += acc_exact.item() / len(output)
+            epoch_acc_pm += acc_prefix / len(output)
             epoch_acc_pw += acc_pairwise.item() / len(output)
             epoch_acc += acc_token.item() / len(output)
 
@@ -226,10 +241,11 @@ def train_epoch(
     log.debug("calculating epoch loss...")
     epoch_loss /= len(loader)
     epoch_acc_em /= len(loader)
+    epoch_acc_pm /= len(loader)
     epoch_acc_pw /= len(loader)
     epoch_acc /= len(loader)
 
-    return epoch_loss, (epoch_acc_em, epoch_acc_pw, epoch_acc)
+    return epoch_loss, (epoch_acc_em, epoch_acc_pm, epoch_acc_pw, epoch_acc)
 
 
 def validate(args, model, loader, optimizer, criterion, device):
@@ -263,6 +279,7 @@ def train(args, model, loaders, optimizer, criterion, device):
     val_losses, val_accs = [], []
 
     for epoch in tqdm.tqdm(range(args.num_epochs)):
+        log.info("Epoch : %s", epoch + 1)
         # train single epoch
         # returns loss for action and target prediction and accuracy
         train_loss, train_acc = train_epoch(
@@ -272,6 +289,7 @@ def train(args, model, loaders, optimizer, criterion, device):
             optimizer,
             criterion,
             device,
+            calc_accuracy=epoch % args.val_every == 0,
         )
 
         # some logging
@@ -291,7 +309,7 @@ def train(args, model, loaders, optimizer, criterion, device):
                 device,
             )
 
-            log.info(f"val loss : {val_loss} | val acc: (exact: {val_acc[0]} | pairwise: {val_acc[1]} | tokens: {val_acc[2]})")
+            log.info(f"val loss : {val_loss:.4f} | val acc: (exact: {val_acc[0]:.4f} | prefix: {val_acc[1]:.4f} | pairwise: {val_acc[2]:.4f} | tokens: {val_acc[3]:.4f})")
 
             val_losses.append(val_loss)
             val_accs.append(val_acc)
@@ -304,6 +322,7 @@ def train(args, model, loaders, optimizer, criterion, device):
     val_x_axis = [5 * i for i in range(len(val_losses))]
 
     fig, axs = plt.subplots(1,1, sharex=True)
+    output_plot_fn_prefix = args.model_output_dir + '/plots-' + args.model_type + ('' if not args.output_plot_fn else '-' + args.output_plot_fn)
 
     axs.plot(train_losses, label='train')
     axs.plot(val_x_axis, val_losses, label='val')
@@ -311,25 +330,26 @@ def train(args, model, loaders, optimizer, criterion, device):
 
     handles, labels = axs.get_legend_handles_labels()
     fig.legend(handles, labels, loc='upper right')
-    fig.savefig(args.model_output_dir + '/plots-' + args.model_type + '-loss.png')
+    fig.savefig(output_plot_fn_prefix + '-loss.png')
 
     fig, axs = plt.subplots(1,1, sharex=True)
 
-    axs.plot(val_x_axis, [em for em,_,_ in val_accs], label='exact match')
-    axs.plot(val_x_axis, [pw for _,pw,_ in val_accs], label='pairwise match')
-    axs.plot(val_x_axis, [tk for _,_,tk in val_accs], label='token match')
+    axs.plot(val_x_axis, [em for em,_,_,_ in val_accs], label='exact match')
+    axs.plot(val_x_axis, [pm for _,pm,_,_ in val_accs], label='prefix match')
+    axs.plot(val_x_axis, [pw for _,_,pw,_ in val_accs], label='pairwise match')
+    axs.plot(val_x_axis, [tk for _,_,_,tk in val_accs], label='token match')
     axs.set_title('Accuracy')
 
     handles, labels = axs.get_legend_handles_labels()
     fig.legend(handles, labels, loc='upper left')
-    fig.savefig(args.model_output_dir + '/plots-' + args.model_type + '-acc.png')
+    fig.savefig(output_plot_fn_prefix + '-acc.png')
 
 
 def main(args):
     device = get_device(args.force_cpu)
 
     # get dataloaders
-    train_loader, val_loader, maps, max_inseq_len, max_outseq_len = setup_dataloader(args)
+    train_loader, val_loader, maps = setup_dataloader(args)
     loaders = {"train": train_loader, "val": val_loader}
 
     # build model
@@ -379,6 +399,13 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", default=0.1, help="learning rate")
     parser.add_argument("--student_forcing", action="store_true", help="use student forcing during training")
     parser.add_argument("--model_type", choices=['lstm', 'attn', 'trfm'], default='lstm', help="type of model to use - lstm (lstm enc-dec) | attn (lstm enc-dec + attention) | trfm (transformer enc - lstm dec)")
+    parser.add_argument("--num_attn_heads",  type=int, default=1, help="number of attention heads to use (in 'attn' or 'trfm' models)")
+    parser.add_argument("--num_trfm_layers", type=int, default=4, help="number of transformer encoder layers to use in 'trfm' model")
+    parser.add_argument("--attn_stride", type=int, default=0, help="")
+    parser.add_argument("--attn_window", type=int, default=25, help="")
+
+    parser.add_argument("--output_plot_fn", default="")
+
 
     args = parser.parse_args()
 

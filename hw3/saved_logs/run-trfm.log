@@ -1,0 +1,328 @@
+2022-11-18:19:32:28 INFO     [log.py:62] Logger configured successfully
+2022-11-18:19:32:28 INFO     [train.py:413] Args:
+	in_data_fn = lang_to_sem_data.json
+	model_output_dir = models
+	batch_size = 128
+	force_cpu = False
+	eval = False
+	num_epochs = 21
+	val_every = 5
+	vocab_size = 1000
+	emb_dim = 100
+	hidden_dim = 100
+	learning_rate = 0.1
+	student_forcing = False
+	model_type = trfm
+	num_attn_heads = 1
+	num_trfm_layers = 4
+	attn_stride = 0
+	attn_window = 25
+	output_plot_fn = 
+2022-11-18:19:32:29 INFO     [utils.py:109] Train #episodes: 70285
+2022-11-18:19:32:29 INFO     [utils.py:110] Val #episodes: 2838
+2022-11-18:19:32:33 DEBUG    [train.py:52] max input sequence length : 375 | max output sequence length : 21
+2022-11-18:19:32:34 INFO     [utils.py:163] Total instances: 70285
+2022-11-18:19:32:34 INFO     [utils.py:166] UNK tokens : 6333 / 5365812 (0.0012)     (vocab_size = 1000)
+2022-11-18:19:32:34 INFO     [utils.py:170] Cut off 0 instances at len 0 before true ending
+2022-11-18:19:32:34 INFO     [utils.py:174] encoded 70285 instances without regard to order
+2022-11-18:19:32:34 INFO     [utils.py:163] Total instances: 2838
+2022-11-18:19:32:34 INFO     [utils.py:166] UNK tokens : 317 / 223108 (0.0014)     (vocab_size = 1000)
+2022-11-18:19:32:34 INFO     [utils.py:170] Cut off 0 instances at len 0 before true ending
+2022-11-18:19:32:34 INFO     [utils.py:174] encoded 2838 instances without regard to order
+2022-11-18:19:32:36 INFO     [train.py:357] EncoderDecoderTransformerAttention(
+  (encoder): EncoderTransformer(
+    (embedding): Embedding(1000, 100, padding_idx=0)
+    (encoder): TransformerEncoder(
+      (layers): ModuleList(
+        (0): TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=100, out_features=100, bias=True)
+          )
+          (linear1): Linear(in_features=100, out_features=128, bias=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+          (linear2): Linear(in_features=128, out_features=100, bias=True)
+          (norm1): LayerNorm((100,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((100,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.1, inplace=False)
+          (dropout2): Dropout(p=0.1, inplace=False)
+        )
+        (1): TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=100, out_features=100, bias=True)
+          )
+          (linear1): Linear(in_features=100, out_features=128, bias=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+          (linear2): Linear(in_features=128, out_features=100, bias=True)
+          (norm1): LayerNorm((100,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((100,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.1, inplace=False)
+          (dropout2): Dropout(p=0.1, inplace=False)
+        )
+        (2): TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=100, out_features=100, bias=True)
+          )
+          (linear1): Linear(in_features=100, out_features=128, bias=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+          (linear2): Linear(in_features=128, out_features=100, bias=True)
+          (norm1): LayerNorm((100,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((100,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.1, inplace=False)
+          (dropout2): Dropout(p=0.1, inplace=False)
+        )
+        (3): TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=100, out_features=100, bias=True)
+          )
+          (linear1): Linear(in_features=100, out_features=128, bias=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+          (linear2): Linear(in_features=128, out_features=100, bias=True)
+          (norm1): LayerNorm((100,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((100,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.1, inplace=False)
+          (dropout2): Dropout(p=0.1, inplace=False)
+        )
+      )
+    )
+  )
+  (decoder): Decoder(
+    (action_embedding): Embedding(11, 100, padding_idx=0)
+    (target_embedding): Embedding(83, 100, padding_idx=0)
+    (lstm): LSTM(200, 100, batch_first=True)
+  )
+  (attn): ModuleList(
+    (0): Linear(in_features=200, out_features=1, bias=True)
+  )
+  (fc_a): Linear(in_features=100, out_features=11, bias=True)
+  (fc_t): Linear(in_features=100, out_features=83, bias=True)
+)
+2022-11-18:19:32:36 INFO     [train.py:282] Epoch : 1
+2022-11-18:19:33:23 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:33:23 INFO     [train.py:296] train loss : 6.286479561545632
+2022-11-18:19:33:23 DEBUG    [train.py:215]  preds : tensor([[1, 1],
+        [5, 2],
+        [5, 2],
+        [5, 2],
+        [5, 2],
+        [5, 2],
+        [5, 2],
+        [5, 2]], device='cuda:0')
+2022-11-18:19:33:23 DEBUG    [train.py:216] labels : tensor([[ 1,  1],
+        [ 5, 74],
+        [ 6, 32],
+        [ 5, 16],
+        [10, 32],
+        [ 5,  9],
+        [ 8,  9],
+        [ 2,  2]], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:33:23 DEBUG    [train.py:217]     em : tensor([[1, 1],
+        [1, 0],
+        [0, 0],
+        [1, 0],
+        [0, 0],
+        [1, 0],
+        [0, 0],
+        [0, 1]], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:33:23 DEBUG    [train.py:218]  pairs : tensor([1, 0, 0, 0, 0, 0, 0, 0], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:33:24 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:33:24 INFO     [train.py:312] val loss : 6.2698 | val acc: (exact: 0.0000 | prefix: 0.1305 | pairwise: 0.1389 | tokens: 0.3672)
+2022-11-18:19:33:24 INFO     [train.py:282] Epoch : 2
+2022-11-18:19:34:14 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:34:14 INFO     [train.py:296] train loss : 6.2210626125335695
+2022-11-18:19:34:14 INFO     [train.py:282] Epoch : 3
+2022-11-18:19:35:06 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:35:06 INFO     [train.py:296] train loss : 6.154563516270031
+2022-11-18:19:35:06 INFO     [train.py:282] Epoch : 4
+2022-11-18:19:35:57 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:35:57 INFO     [train.py:296] train loss : 6.126895069642501
+2022-11-18:19:35:57 INFO     [train.py:282] Epoch : 5
+2022-11-18:19:36:46 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:36:46 INFO     [train.py:296] train loss : 6.10829609003934
+2022-11-18:19:36:46 INFO     [train.py:282] Epoch : 6
+2022-11-18:19:37:33 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:37:33 INFO     [train.py:296] train loss : 6.096242373206398
+2022-11-18:19:37:33 DEBUG    [train.py:215]  preds : tensor([[ 1,  1],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32]], device='cuda:0')
+2022-11-18:19:37:33 DEBUG    [train.py:216] labels : tensor([[ 1,  1],
+        [ 5, 22],
+        [ 6,  5],
+        [ 5, 32],
+        [ 7, 32],
+        [ 5, 22],
+        [ 8, 22],
+        [ 5, 22],
+        [ 6, 32],
+        [ 5, 16],
+        [10, 32],
+        [ 5, 18],
+        [ 8, 18],
+        [ 2,  2]], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:37:33 DEBUG    [train.py:217]     em : tensor([[1, 1],
+        [1, 0],
+        [0, 0],
+        [1, 1],
+        [0, 1],
+        [1, 0],
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [1, 0],
+        [0, 1],
+        [1, 0],
+        [0, 0],
+        [0, 0]], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:37:33 DEBUG    [train.py:218]  pairs : tensor([1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], device='cuda:0',
+       dtype=torch.int32)
+2022-11-18:19:37:35 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:37:35 INFO     [train.py:312] val loss : 6.1004 | val acc: (exact: 0.0000 | prefix: 0.1377 | pairwise: 0.2092 | tokens: 0.4206)
+2022-11-18:19:37:35 INFO     [train.py:282] Epoch : 7
+2022-11-18:19:38:26 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:38:26 INFO     [train.py:296] train loss : 6.087087655500932
+2022-11-18:19:38:26 INFO     [train.py:282] Epoch : 8
+2022-11-18:19:39:18 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:39:18 INFO     [train.py:296] train loss : 6.079274656122381
+2022-11-18:19:39:18 INFO     [train.py:282] Epoch : 9
+2022-11-18:19:40:09 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:40:09 INFO     [train.py:296] train loss : 6.073108378323641
+2022-11-18:19:40:09 INFO     [train.py:282] Epoch : 10
+2022-11-18:19:40:58 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:40:58 INFO     [train.py:296] train loss : 6.067723575938832
+2022-11-18:19:40:58 INFO     [train.py:282] Epoch : 11
+2022-11-18:19:41:46 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:41:46 INFO     [train.py:296] train loss : 6.063694930510088
+2022-11-18:19:41:46 DEBUG    [train.py:215]  preds : tensor([[1, 1],
+        [5, 2],
+        [5, 2],
+        [5, 2],
+        [5, 2],
+        [5, 2]], device='cuda:0')
+2022-11-18:19:41:46 DEBUG    [train.py:216] labels : tensor([[ 1,  1],
+        [ 5, 18],
+        [ 6, 32],
+        [ 5,  9],
+        [ 8,  9],
+        [ 2,  2]], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:41:46 DEBUG    [train.py:217]     em : tensor([[1, 1],
+        [1, 0],
+        [0, 0],
+        [1, 0],
+        [0, 0],
+        [0, 1]], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:41:46 DEBUG    [train.py:218]  pairs : tensor([1, 0, 0, 0, 0, 0], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:41:48 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:41:48 INFO     [train.py:312] val loss : 6.0753 | val acc: (exact: 0.0000 | prefix: 0.1375 | pairwise: 0.2228 | tokens: 0.4284)
+2022-11-18:19:41:48 INFO     [train.py:282] Epoch : 12
+2022-11-18:19:42:38 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:42:38 INFO     [train.py:296] train loss : 6.060440572391856
+2022-11-18:19:42:38 INFO     [train.py:282] Epoch : 13
+2022-11-18:19:43:28 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:43:28 INFO     [train.py:296] train loss : 6.057338845513084
+2022-11-18:19:43:28 INFO     [train.py:282] Epoch : 14
+2022-11-18:19:44:20 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:44:20 INFO     [train.py:296] train loss : 6.054706763354215
+2022-11-18:19:44:20 INFO     [train.py:282] Epoch : 15
+2022-11-18:19:45:06 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:45:06 INFO     [train.py:296] train loss : 6.052155535437844
+2022-11-18:19:45:06 INFO     [train.py:282] Epoch : 16
+2022-11-18:19:45:55 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:45:55 INFO     [train.py:296] train loss : 6.050035656148737
+2022-11-18:19:45:55 DEBUG    [train.py:215]  preds : tensor([[ 1,  1],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32],
+        [ 5, 32]], device='cuda:0')
+2022-11-18:19:45:55 DEBUG    [train.py:216] labels : tensor([[ 1,  1],
+        [ 5, 32],
+        [ 6, 32],
+        [ 5, 16],
+        [10, 32],
+        [ 5, 74],
+        [ 8, 74],
+        [ 2,  2]], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:45:55 DEBUG    [train.py:217]     em : tensor([[1, 1],
+        [1, 1],
+        [0, 1],
+        [1, 0],
+        [0, 1],
+        [1, 0],
+        [0, 0],
+        [0, 0]], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:45:55 DEBUG    [train.py:218]  pairs : tensor([1, 1, 0, 0, 0, 0, 0, 0], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:45:57 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:45:57 INFO     [train.py:312] val loss : 6.0591 | val acc: (exact: 0.0000 | prefix: 0.1393 | pairwise: 0.2395 | tokens: 0.4369)
+2022-11-18:19:45:57 INFO     [train.py:282] Epoch : 17
+2022-11-18:19:46:47 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:46:47 INFO     [train.py:296] train loss : 6.048232039538297
+2022-11-18:19:46:47 INFO     [train.py:282] Epoch : 18
+2022-11-18:19:47:38 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:47:38 INFO     [train.py:296] train loss : 6.046578895395452
+2022-11-18:19:47:38 INFO     [train.py:282] Epoch : 19
+2022-11-18:19:48:29 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:48:29 INFO     [train.py:296] train loss : 6.044991458546032
+2022-11-18:19:48:29 INFO     [train.py:282] Epoch : 20
+2022-11-18:19:49:15 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:49:15 INFO     [train.py:296] train loss : 6.043539622913707
+2022-11-18:19:49:15 INFO     [train.py:282] Epoch : 21
+2022-11-18:19:50:06 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:50:06 INFO     [train.py:296] train loss : 6.042195537740534
+2022-11-18:19:50:06 DEBUG    [train.py:215]  preds : tensor([[ 1,  1],
+        [ 5, 22],
+        [ 5, 22],
+        [ 5, 22],
+        [ 5, 22],
+        [ 5, 22],
+        [ 5, 22],
+        [ 5, 22],
+        [ 5, 22],
+        [ 5, 22],
+        [ 5, 22],
+        [ 5, 22],
+        [ 5, 22],
+        [ 5, 22]], device='cuda:0')
+2022-11-18:19:50:06 DEBUG    [train.py:216] labels : tensor([[ 1,  1],
+        [ 5, 74],
+        [ 6, 15],
+        [ 5, 22],
+        [ 8, 22],
+        [ 6, 55],
+        [ 7, 15],
+        [ 8, 22],
+        [ 6, 15],
+        [ 5, 16],
+        [10, 15],
+        [ 5, 22],
+        [ 8, 22],
+        [ 2,  2]], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:50:06 DEBUG    [train.py:217]     em : tensor([[1, 1],
+        [1, 0],
+        [0, 0],
+        [1, 1],
+        [0, 1],
+        [0, 0],
+        [0, 0],
+        [0, 1],
+        [0, 0],
+        [1, 0],
+        [0, 0],
+        [1, 1],
+        [0, 1],
+        [0, 0]], device='cuda:0', dtype=torch.int32)
+2022-11-18:19:50:06 DEBUG    [train.py:218]  pairs : tensor([1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], device='cuda:0',
+       dtype=torch.int32)
+2022-11-18:19:50:08 DEBUG    [train.py:241] calculating epoch loss...
+2022-11-18:19:50:08 INFO     [train.py:312] val loss : 6.0541 | val acc: (exact: 0.0000 | prefix: 0.1382 | pairwise: 0.2381 | tokens: 0.4407)

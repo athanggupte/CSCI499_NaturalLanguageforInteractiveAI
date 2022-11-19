@@ -39,14 +39,14 @@ def build_tokenizer_table(train, vocab_size=1000):
     padded_lens = []
     inst_count = 0
     for episode in train:
+        padded_len = 2  # start/end
         for inst, _ in episode:
             inst = preprocess_string(inst)
-            padded_len = 2  # start/end
             for word in inst.lower().split():
                 if len(word) > 0:
                     word_list.append(word)
                     padded_len += 1
-            padded_lens.append(padded_len)
+        padded_lens.append(padded_len)
     corpus = Counter(word_list)
     corpus_ = sorted(corpus, key=corpus.get, reverse=True)[
         : vocab_size - 4
@@ -71,8 +71,8 @@ def build_output_tables(train):
     max_len = 0
 
     for episode in train:
+        max_len = max(max_len, len(episode) + 2)
         for _, outseq in episode:
-            max_len = max(max_len, len(outseq) + 2)
             a, t = outseq
             actions.add(a)
             targets.add(t)
@@ -93,7 +93,7 @@ def prefix_match(predicted_labels, gt_labels):
     seq_length = len(gt_labels)
     
     for i in range(seq_length):
-        if predicted_labels[i] != gt_labels[i]:
+        if torch.any(predicted_labels[i] != gt_labels[i]):
             break
     
     pm = (1.0 / seq_length) * i
